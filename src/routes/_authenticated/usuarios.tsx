@@ -113,6 +113,17 @@ function UsuariosPage() {
     }
   }
 
+  async function handleCambiarRol(u: UsuarioRow, rol: "admin" | "ejecutivo") {
+    if (u.rol === rol) return;
+    try {
+      await cambiarRolFn({ data: { userId: u.id, rol } });
+      toast.success("Rol actualizado");
+      cargar();
+    } catch (err: any) {
+      toast.error(err?.message ?? "No se pudo cambiar el rol");
+    }
+  }
+
   return (
     <div className="mx-auto max-w-5xl space-y-4">
       <div className="flex items-center justify-between">
