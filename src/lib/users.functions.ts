@@ -117,7 +117,12 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       await supabaseAdmin.auth.admin.updateUserById(data.id, {
         ban_duration: data.activo ? "none" : "876000h",
+      });
+    }
+    return { ok: true };
   });
+
+
 
 export const cambiarRol = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
