@@ -153,7 +153,3 @@ export const cambiarRol = createServerFn({ method: "POST" })
     if (insErr) throw new Error(insErr.message);
     return { ok: true };
   });
-
-    }
-    return { ok: true };
-  });
