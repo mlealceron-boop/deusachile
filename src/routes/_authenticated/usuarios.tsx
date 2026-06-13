@@ -195,9 +195,18 @@ function UsuariosPage() {
                     <TableCell className="font-medium">{u.nombre}</TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>
-                      <Badge variant={u.rol === "admin" ? "default" : "secondary"}>
-                        {u.rol === "admin" ? "Administrador" : "Ejecutivo"}
-                      </Badge>
+                      <Select
+                        value={u.rol ?? "ejecutivo"}
+                        onValueChange={(v) => handleCambiarRol(u, v as "admin" | "ejecutivo")}
+                      >
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ejecutivo">Ejecutivo</SelectItem>
+                          <SelectItem value="admin">Administrador</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <Switch checked={u.activo} onCheckedChange={() => toggleActivo(u)} />
