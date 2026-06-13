@@ -57,6 +57,7 @@ interface UsuarioRow {
 function UsuariosPage() {
   const crear = useServerFn(crearUsuario);
   const actualizar = useServerFn(actualizarUsuario);
+  const cambiarRolFn = useServerFn(cambiarRol);
   const [usuarios, setUsuarios] = useState<UsuarioRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
