@@ -50,6 +50,24 @@ function AuthPage() {
     router.navigate({ to: "/dashboard", replace: true });
   }
 
+  async function handleGoogleSignIn() {
+    setLoading(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    setLoading(false);
+    if (result.error) {
+      toast.error(result.error.message ?? "Error al iniciar sesión con Google");
+      return;
+    }
+    if (result.redirected) {
+      // Browser will redirect to Google
+      return;
+    }
+    toast.success("Sesión iniciada");
+    router.navigate({ to: "/dashboard", replace: true });
+  }
+
   async function handleBootstrap(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
