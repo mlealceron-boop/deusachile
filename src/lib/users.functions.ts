@@ -106,7 +106,7 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await asegurarAdmin(context.supabase, context.userId);
-    const patch: Record<string, unknown> = {};
+    const patch: { nombre?: string; activo?: boolean } = {};
     if (data.nombre !== undefined) patch.nombre = data.nombre;
     if (data.activo !== undefined) patch.activo = data.activo;
     if (Object.keys(patch).length > 0) {
