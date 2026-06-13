@@ -121,3 +121,35 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+
+
+export const cambiarRol = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; rol: "admin" | "ejecutivo" }) =>
+    z.object({ userId: z.string().uuid(), rol: RolEnum }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await asegurarAdmin(context.supabase, context.userId);
+    if (data.userId === context.userId && data.rol !== "admin") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { count } = await supabaseAdmin
+        .from("user_roles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "admin");
+      if ((count ?? 0) <= 1) {
+        throw new Error("Debe existir al menos un administrador");
+      }
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error: delErr } = await supabaseAdmin
+      .from("user_roles")
+      .delete()
+      .eq("user_id", data.userId);
+    if (delErr) throw new Error(delErr.message);
+    const { error: insErr } = await supabaseAdmin
+      .from("user_roles")
+      .insert({ user_id: data.userId, role: data.rol });
+    if (insErr) throw new Error(insErr.message);
+    return { ok: true };
+  });

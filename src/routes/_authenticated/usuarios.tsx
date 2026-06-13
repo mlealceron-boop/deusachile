@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { actualizarUsuario, crearUsuario } from "@/lib/users.functions";
+import { actualizarUsuario, cambiarRol, crearUsuario } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   beforeLoad: async () => {
@@ -57,6 +57,7 @@ interface UsuarioRow {
 function UsuariosPage() {
   const crear = useServerFn(crearUsuario);
   const actualizar = useServerFn(actualizarUsuario);
+  const cambiarRolFn = useServerFn(cambiarRol);
   const [usuarios, setUsuarios] = useState<UsuarioRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -109,6 +110,17 @@ function UsuariosPage() {
       cargar();
     } catch (err: any) {
       toast.error(err?.message ?? "Error");
+    }
+  }
+
+  async function handleCambiarRol(u: UsuarioRow, rol: "admin" | "ejecutivo") {
+    if (u.rol === rol) return;
+    try {
+      await cambiarRolFn({ data: { userId: u.id, rol } });
+      toast.success("Rol actualizado");
+      cargar();
+    } catch (err: any) {
+      toast.error(err?.message ?? "No se pudo cambiar el rol");
     }
   }
 
@@ -183,9 +195,18 @@ function UsuariosPage() {
                     <TableCell className="font-medium">{u.nombre}</TableCell>
                     <TableCell>{u.email}</TableCell>
                     <TableCell>
-                      <Badge variant={u.rol === "admin" ? "default" : "secondary"}>
-                        {u.rol === "admin" ? "Administrador" : "Ejecutivo"}
-                      </Badge>
+                      <Select
+                        value={u.rol ?? "ejecutivo"}
+                        onValueChange={(v) => handleCambiarRol(u, v as "admin" | "ejecutivo")}
+                      >
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ejecutivo">Ejecutivo</SelectItem>
+                          <SelectItem value="admin">Administrador</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <Switch checked={u.activo} onCheckedChange={() => toggleActivo(u)} />
