@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
-import { actualizarUsuario, crearUsuario } from "@/lib/users.functions";
+import { actualizarUsuario, cambiarRol, crearUsuario } from "@/lib/users.functions";
 
 export const Route = createFileRoute("/_authenticated/usuarios")({
   beforeLoad: async () => {
