@@ -14,16 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      clientes: {
+        Row: {
+          clinica: string | null
+          contacto: string | null
+          creado_en: string
+          ejecutivo_id: string
+          estado: Database["public"]["Enums"]["estado_cliente"]
+          id: string
+          nombre: string
+          tipo: Database["public"]["Enums"]["tipo_cliente"]
+        }
+        Insert: {
+          clinica?: string | null
+          contacto?: string | null
+          creado_en?: string
+          ejecutivo_id: string
+          estado?: Database["public"]["Enums"]["estado_cliente"]
+          id?: string
+          nombre: string
+          tipo?: Database["public"]["Enums"]["tipo_cliente"]
+        }
+        Update: {
+          clinica?: string | null
+          contacto?: string | null
+          creado_en?: string
+          ejecutivo_id?: string
+          estado?: Database["public"]["Enums"]["estado_cliente"]
+          id?: string
+          nombre?: string
+          tipo?: Database["public"]["Enums"]["tipo_cliente"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clientes_ejecutivo_id_fkey"
+            columns: ["ejecutivo_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interacciones: {
+        Row: {
+          cliente_id: string
+          fecha: string
+          id: string
+          nota: string
+          usuario_id: string
+        }
+        Insert: {
+          cliente_id: string
+          fecha?: string
+          id?: string
+          nota: string
+          usuario_id: string
+        }
+        Update: {
+          cliente_id?: string
+          fecha?: string
+          id?: string
+          nota?: string
+          usuario_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interacciones_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interacciones_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      usuarios: {
+        Row: {
+          activo: boolean
+          creado_en: string
+          email: string
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          creado_en?: string
+          email: string
+          id: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          creado_en?: string
+          email?: string
+          id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "ejecutivo"
+      estado_cliente: "prospecto" | "activo" | "inactivo"
+      tipo_cliente: "clinica_propia" | "recien_empieza"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +279,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "ejecutivo"],
+      estado_cliente: ["prospecto", "activo", "inactivo"],
+      tipo_cliente: ["clinica_propia", "recien_empieza"],
+    },
   },
 } as const
