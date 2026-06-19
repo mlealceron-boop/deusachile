@@ -128,27 +128,28 @@ function DashboardPage() {
         from.setHours(0, 0, 0, 0);
         to.setHours(23, 59, 59, 999);
         break;
-      case "semana":
-        // Start of current week (Monday)
+      case "semana": {
+        // Monday → Sunday of current week
         const day = from.getDay();
         const diff = from.getDate() - day + (day === 0 ? -6 : 1);
-        from.setDate(diff);
-        from.setHours(0, 0, 0, 0);
+        from = new Date(from.getFullYear(), from.getMonth(), diff, 0, 0, 0, 0);
+        to = new Date(from);
+        to.setDate(from.getDate() + 6);
         to.setHours(23, 59, 59, 999);
         break;
+      }
       case "mes":
-        // Start of current month
-        from = new Date(now.getFullYear(), now.getMonth(), 1);
-        to.setHours(23, 59, 59, 999);
+        // Full current month
+        from = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+        to = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
         break;
       case "ultimo_mes":
-        // Previous month's full range
-        from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        from = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
         to = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
         break;
       case "personalizado":
         from = desde ? new Date(desde + "T00:00:00") : new Date(now.getFullYear(), now.getMonth(), 1);
-        to = hasta ? new Date(hasta + "T23:59:59") : new Date();
+        to = hasta ? new Date(hasta + "T23:59:59") : new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
         break;
     }
     return { from, to };
