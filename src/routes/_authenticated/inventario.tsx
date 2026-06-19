@@ -198,8 +198,8 @@ function InventarioPage() {
         p_producto_id: entradaForm.producto_id,
         p_cantidad: qty,
         p_costo_unitario: cost,
-        p_usuario_id: user?.id || null,
-        p_nota: entradaForm.nota.trim() || null,
+        p_usuario_id: user?.id ?? "",
+        p_nota: entradaForm.nota.trim() || "",
       });
 
       if (error) throw error;
