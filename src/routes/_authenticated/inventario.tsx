@@ -235,7 +235,7 @@ function InventarioPage() {
         p_producto_id: ajusteForm.producto_id,
         p_tipo: ajusteForm.tipo,
         p_cantidad: qty,
-        p_usuario_id: user?.id || null,
+        p_usuario_id: user?.id ?? "",
         p_nota: ajusteForm.nota.trim(),
       });
 
@@ -659,9 +659,9 @@ function InventarioPage() {
                 <div className="font-semibold text-primary">Simulación Precio Promedio Ponderado (PPM)</div>
                 <div className="grid grid-cols-2 gap-2 text-slate-600 font-medium">
                   <div>Stock actual: {previewPpm.stockAntes} un.</div>
-                  <div>PPM actual: {formatCLP(previewPpm.ppmAntes)}</div>
+                  <div>PPM actual: {formatCLP(previewPpm.ppmAntes ?? 0)}</div>
                   <div className="font-semibold text-slate-800">Stock Resultante: {previewPpm.stockResultante} un.</div>
-                  <div className="font-semibold text-primary">PPM Resultante: {formatCLP(previewPpm.ppmResultante)}</div>
+                  <div className="font-semibold text-primary">PPM Resultante: {formatCLP(previewPpm.ppmResultante ?? 0)}</div>
                 </div>
               </div>
             )}
