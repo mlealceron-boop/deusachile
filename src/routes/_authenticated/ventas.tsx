@@ -98,6 +98,8 @@ function VentasPage() {
   const [ejecutivos, setEjecutivos] = useState<{ id: string; nombre: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [inventario, setInventario] = useState<Record<string, { stock_actual: number; stock_minimo: number }>>({});
+
   // Commission Config
   const [porcentajeComisionVigente, setPorcentajeComisionVigente] = useState(8.0);
 
@@ -156,7 +158,23 @@ function VentasPage() {
       if (uErr) throw uErr;
       setEjecutivos(uData ?? []);
 
-      // 5. Fetch current commission config
+      // 5. Fetch inventory
+      const { data: invData, error: invErr } = await supabase
+        .from("inventario")
+        .select("producto_id, stock_actual, stock_minimo");
+      if (invErr) throw invErr;
+      const invMap: Record<string, { stock_actual: number; stock_minimo: number }> = {};
+      if (invData) {
+        invData.forEach((item) => {
+          invMap[item.producto_id] = {
+            stock_actual: Number(item.stock_actual || 0),
+            stock_minimo: Number(item.stock_minimo || 0),
+          };
+        });
+      }
+      setInventario(invMap);
+
+      // 6. Fetch current commission config
       const { data: comData } = await supabase
         .from("config_comision")
         .select("porcentaje")
@@ -283,6 +301,18 @@ function VentasPage() {
       return;
     }
 
+    // 0. Validate stock level locally before pushing changes
+    for (const item of formItems) {
+      const stockDisp = inventario[item.producto_id]?.stock_actual ?? 0;
+      if (item.cantidad > stockDisp) {
+        const prod = productos.find(p => p.id === item.producto_id);
+        const { nombre: cleanNombre } = prod ? parseProductoNombre(prod.nombre) : { nombre: "Producto" };
+        toast.error(`Stock insuficiente para ${cleanNombre}. Disponible: ${stockDisp} unidades.`);
+        setGuardando(false);
+        return;
+      }
+    }
+
     setGuardando(true);
     try {
       // 1. Insert header
@@ -318,7 +348,18 @@ function VentasPage() {
       const { error: itemsErr } = await supabase.from("venta_items").insert(itemsPayload);
       if (itemsErr) throw itemsErr;
 
-      // 3. Trigger recalculate database function
+      // 3. Register stock outputs via RPC (takes care of updating inventario and logging movements)
+      for (const item of formItems) {
+        const { error: rpcStockErr } = await supabase.rpc("registrar_salida_venta", {
+          p_producto_id: item.producto_id,
+          p_cantidad: item.cantidad,
+          p_venta_id: ventaId,
+          p_usuario_id: user?.id || ""
+        });
+        if (rpcStockErr) throw rpcStockErr;
+      }
+
+      // 4. Trigger recalculate database function
       const { error: rpcErr } = await supabase.rpc("recalcular_venta", { p_venta_id: ventaId });
       if (rpcErr) throw rpcErr;
 
@@ -659,8 +700,26 @@ function VentasPage() {
                                 })}
                               </SelectContent>
                             </Select>
+                            {(() => {
+                              const stockDisp = inventario[item.producto_id]?.stock_actual ?? 0;
+                              const stockMin = inventario[item.producto_id]?.stock_minimo ?? 0;
+                              let stockClass = "text-emerald-600 font-semibold";
+                              let stockText = `Stock disponible: ${stockDisp} un.`;
+                              if (stockDisp === 0) {
+                                stockClass = "text-red-600 font-bold";
+                                stockText = "Sin stock disponible";
+                              } else if (stockDisp <= stockMin) {
+                                stockClass = "text-amber-600 font-bold";
+                                stockText = `Stock bajo: ${stockDisp} un. (Mín: ${stockMin})`;
+                              }
+                              return (
+                                <div className={`text-[10px] ${stockClass} mt-0.5`}>
+                                  {stockText}
+                                </div>
+                              );
+                            })()}
                             {escalas.length > 0 && (
-                              <div className="text-[10px] text-muted-foreground mt-1">
+                              <div className="text-[10px] text-muted-foreground mt-0.5">
                                 Escala: {escalas.map(e => `${e.cantidadMinima}+ un -> ${formatCLP(e.precioNeto)}`).join(" | ")}
                               </div>
                             )}
