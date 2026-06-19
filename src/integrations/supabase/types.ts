@@ -517,6 +517,123 @@ export type Database = {
           },
         ]
       }
+      modulos_capacitacion: {
+        Row: {
+          id: string
+          nombre: string
+          descripcion: string | null
+          link_externo: string
+          dirigido_a: "cliente" | "ejecutivo" | "ambos"
+          activo: boolean
+          creado_en: string
+        }
+        Insert: {
+          id?: string
+          nombre: string
+          descripcion?: string | null
+          link_externo: string
+          dirigido_a?: "cliente" | "ejecutivo" | "ambos"
+          activo?: boolean
+          creado_en?: string
+        }
+        Update: {
+          id?: string
+          nombre?: string
+          descripcion?: string | null
+          link_externo?: string
+          dirigido_a?: "cliente" | "ejecutivo" | "ambos"
+          activo?: boolean
+          creado_en?: string
+        }
+        Relationships: []
+      }
+      progreso_capacitacion: {
+        Row: {
+          id: string
+          modulo_id: string
+          cliente_id: string | null
+          usuario_id: string | null
+          estado: "no_iniciado" | "en_curso" | "completado"
+          actualizado_en: string
+        }
+        Insert: {
+          id?: string
+          modulo_id: string
+          cliente_id?: string | null
+          usuario_id?: string | null
+          estado?: "no_iniciado" | "en_curso" | "completado"
+          actualizado_en?: string
+        }
+        Update: {
+          id?: string
+          modulo_id?: string
+          cliente_id?: string | null
+          usuario_id?: string | null
+          estado?: "no_iniciado" | "en_curso" | "completado"
+          actualizado_en?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progreso_capacitacion_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos_capacitacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progreso_capacitacion_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progreso_capacitacion_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      auditoria: {
+        Row: {
+          id: string
+          usuario_id: string | null
+          accion: string
+          tabla_afectada: string
+          registro_id: string | null
+          detalle: Json
+          fecha: string
+        }
+        Insert: {
+          id?: string
+          usuario_id?: string | null
+          accion: string
+          tabla_afectada: string
+          registro_id?: string | null
+          detalle?: Json
+          fecha?: string
+        }
+        Update: {
+          id?: string
+          usuario_id?: string | null
+          accion?: string
+          tabla_afectada?: string
+          registro_id?: string | null
+          detalle?: Json
+          fecha?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auditoria_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
