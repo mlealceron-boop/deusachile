@@ -134,7 +134,7 @@ function VentasPage() {
       // 2. Fetch active products
       const { data: pData, error: pErr } = await supabase
         .from("productos")
-        .select("*, marcas:marca_id(nombre)")
+        .select("id,marca_id,nombre,precio_referencia,activo,creado_en, marcas:marca_id(nombre)")
         .eq("activo", true)
         .order("nombre");
       if (pErr) throw pErr;
