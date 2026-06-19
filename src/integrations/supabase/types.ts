@@ -451,6 +451,24 @@ export type Database = {
         }
         Returns: undefined
       }
+      get_productos_admin: {
+        Args: never
+        Returns: {
+          activo: boolean
+          costo_referencia: number
+          creado_en: string
+          id: string
+          marca_id: string
+          nombre: string
+          precio_referencia: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "productos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

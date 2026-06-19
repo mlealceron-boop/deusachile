@@ -106,25 +106,42 @@ function CatalogoPage() {
   async function cargarDatos() {
     setLoading(true);
     try {
-      const [{ data: mData, error: mErr }, { data: pData, error: pErr }] = await Promise.all([
+      const productosQuery = isAdmin
+        ? supabase.rpc("get_productos_admin")
+        : supabase
+            .from("productos")
+            .select("id,marca_id,nombre,precio_referencia,activo,creado_en")
+            .order("nombre");
+
+      const [{ data: mData, error: mErr }, { data: pRaw, error: pErr }] = await Promise.all([
         supabase.from("marcas").select("*").order("nombre"),
-        supabase.from("productos").select("*, marcas:marca_id(nombre)").order("nombre"),
+        productosQuery,
       ]);
 
       if (mErr) throw mErr;
       if (pErr) throw pErr;
 
-      setMarcas(mData ?? []);
-      setProductos(pData ?? []);
+      const marcasList = (mData ?? []) as Marca[];
+      const productosList: Producto[] = ((pRaw ?? []) as any[]).map((p) => ({
+        id: p.id,
+        marca_id: p.marca_id,
+        nombre: p.nombre,
+        precio_referencia: Number(p.precio_referencia ?? 0),
+        costo_referencia: Number(p.costo_referencia ?? 0),
+        activo: p.activo,
+        creado_en: p.creado_en,
+        marcas: marcasList.find((m) => m.id === p.marca_id) ?? null,
+      }));
+
+      setMarcas(marcasList);
+      setProductos(productosList);
 
       // Load image URLs dynamically
       const urls: Record<string, string> = {};
-      if (pData) {
-        for (const prod of pData) {
-          const { data } = supabase.storage.from("productos").getPublicUrl(`${prod.id}.png`);
-          if (data?.publicUrl) {
-            urls[prod.id] = `${data.publicUrl}?t=${Date.now()}`;
-          }
+      for (const prod of productosList) {
+        const { data } = supabase.storage.from("productos").getPublicUrl(`${prod.id}.png`);
+        if (data?.publicUrl) {
+          urls[prod.id] = `${data.publicUrl}?t=${Date.now()}`;
         }
       }
       setProductoImages(urls);
@@ -136,8 +153,10 @@ function CatalogoPage() {
   }
 
   useEffect(() => {
+    if (!user) return;
     cargarDatos();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isAdmin]);
 
   // --- MARCAS HANDLERS ---
   function abrirNuevaMarca() {
