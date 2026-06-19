@@ -171,6 +171,112 @@ export type Database = {
           },
         ]
       }
+      reuniones: {
+        Row: {
+          cliente_id: string
+          creado_en: string
+          ejecutivo_id: string
+          estado: Database["public"]["Enums"]["estado_reunion"]
+          fecha_hora: string
+          id: string
+          objetivo: string
+          resultado: string | null
+        }
+        Insert: {
+          cliente_id: string
+          creado_en?: string
+          ejecutivo_id: string
+          estado?: Database["public"]["Enums"]["estado_reunion"]
+          fecha_hora: string
+          id?: string
+          objetivo: string
+          resultado?: string | null
+        }
+        Update: {
+          cliente_id?: string
+          creado_en?: string
+          ejecutivo_id?: string
+          estado?: Database["public"]["Enums"]["estado_reunion"]
+          fecha_hora?: string
+          id?: string
+          objetivo?: string
+          resultado?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reuniones_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reuniones_ejecutivo_id_fkey"
+            columns: ["ejecutivo_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tareas: {
+        Row: {
+          cliente_id: string | null
+          creado_en: string
+          creado_por: string | null
+          descripcion: string | null
+          ejecutivo_id: string
+          estado: Database["public"]["Enums"]["estado_tarea"]
+          fecha_limite: string | null
+          id: string
+          titulo: string
+        }
+        Insert: {
+          cliente_id?: string | null
+          creado_en?: string
+          creado_por?: string | null
+          descripcion?: string | null
+          ejecutivo_id: string
+          estado?: Database["public"]["Enums"]["estado_tarea"]
+          fecha_limite?: string | null
+          id?: string
+          titulo: string
+        }
+        Update: {
+          cliente_id?: string | null
+          creado_en?: string
+          creado_por?: string | null
+          descripcion?: string | null
+          ejecutivo_id?: string
+          estado?: Database["public"]["Enums"]["estado_tarea"]
+          fecha_limite?: string | null
+          id?: string
+          titulo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tareas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tareas_ejecutivo_id_fkey"
+            columns: ["ejecutivo_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -357,6 +463,8 @@ export type Database = {
     Enums: {
       app_role: "admin" | "ejecutivo"
       estado_cliente: "prospecto" | "activo" | "inactivo"
+      estado_reunion: "agendada" | "realizada" | "cancelada"
+      estado_tarea: "pendiente" | "en_curso" | "completada"
       tipo_cliente: "clinica_propia" | "recien_empieza"
     }
     CompositeTypes: {
@@ -487,6 +595,8 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "ejecutivo"],
       estado_cliente: ["prospecto", "activo", "inactivo"],
+      estado_reunion: ["agendada", "realizada", "cancelada"],
+      estado_tarea: ["pendiente", "en_curso", "completada"],
       tipo_cliente: ["clinica_propia", "recien_empieza"],
     },
   },
