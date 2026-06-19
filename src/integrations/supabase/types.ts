@@ -359,6 +359,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "venta_items_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos_publicos"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "venta_items_venta_id_fkey"
             columns: ["venta_id"]
             isOneToOne: false
@@ -430,7 +437,41 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      productos_publicos: {
+        Row: {
+          activo: boolean | null
+          creado_en: string | null
+          id: string | null
+          marca_id: string | null
+          nombre: string | null
+          precio_referencia: number | null
+        }
+        Insert: {
+          activo?: boolean | null
+          creado_en?: string | null
+          id?: string | null
+          marca_id?: string | null
+          nombre?: string | null
+          precio_referencia?: number | null
+        }
+        Update: {
+          activo?: boolean | null
+          creado_en?: string | null
+          id?: string | null
+          marca_id?: string | null
+          nombre?: string | null
+          precio_referencia?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productos_marca_id_fkey"
+            columns: ["marca_id"]
+            isOneToOne: false
+            referencedRelation: "marcas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       any_admin_exists: { Args: never; Returns: boolean }
