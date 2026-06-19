@@ -1,24 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const RolEnum = z.enum(["admin", "ejecutivo"]);
 
-async function asegurarAdmin(supabase: any, userId: string) {
-  const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", userId);
-  if (!roles?.some((r: any) => r.role === "admin")) {
-    throw new Error("No autorizado");
-  }
+function publicClient() {
+  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export const adminExiste = createServerFn({ method: "GET" }).handler(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { count, error } = await supabaseAdmin
-    .from("user_roles")
-    .select("*", { count: "exact", head: true })
-    .eq("role", "admin");
+  const sb = publicClient();
+  const { data, error } = await sb.rpc("any_admin_exists");
   if (error) throw new Error(error.message);
-  return { existe: (count ?? 0) > 0 };
+  return { existe: !!data };
 });
 
 export const bootstrapAdmin = createServerFn({ method: "POST" })
@@ -32,29 +29,28 @@ export const bootstrapAdmin = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { count } = await supabaseAdmin
-      .from("user_roles")
-      .select("*", { count: "exact", head: true })
-      .eq("role", "admin");
-    if ((count ?? 0) > 0) throw new Error("Ya existe un administrador");
+    const sb = publicClient();
+    const { data: exists, error: chkErr } = await sb.rpc("any_admin_exists");
+    if (chkErr) throw new Error(chkErr.message);
+    if (exists) throw new Error("Ya existe un administrador");
 
-    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+    const { data: signUp, error: signErr } = await sb.auth.signUp({
       email: data.email,
       password: data.password,
-      email_confirm: true,
-      user_metadata: { nombre: data.nombre },
+      options: { data: { nombre: data.nombre } },
     });
-    if (error || !created.user) throw new Error(error?.message ?? "No se pudo crear el usuario");
-    const uid = created.user.id;
-    const { error: e1 } = await supabaseAdmin
-      .from("usuarios")
-      .insert({ id: uid, nombre: data.nombre, email: data.email });
-    if (e1) throw new Error(e1.message);
-    const { error: e2 } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: uid, role: "admin" });
-    if (e2) throw new Error(e2.message);
+    if (signErr) throw new Error(signErr.message);
+    if (!signUp.session) {
+      throw new Error(
+        "Cuenta creada, pero requiere confirmación por email. Pide al equipo de Lovable habilitar auto-confirm o confirma desde el correo y vuelve a entrar.",
+      );
+    }
+    // Use the new session to call bootstrap_admin as the just-created user.
+    const { error: bootErr } = await sb.rpc("bootstrap_admin", {
+      p_nombre: data.nombre,
+      p_email: data.email,
+    });
+    if (bootErr) throw new Error(bootErr.message);
     return { ok: true };
   });
 
@@ -72,24 +68,31 @@ export const crearUsuario = createServerFn({ method: "POST" })
         .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await asegurarAdmin(context.supabase, context.userId);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("No autorizado");
+
+    // Sign up the new user from an ephemeral client so the admin's session is untouched.
+    const sb = publicClient();
+    const { data: signUp, error: signErr } = await sb.auth.signUp({
       email: data.email,
       password: data.password,
-      email_confirm: true,
-      user_metadata: { nombre: data.nombre },
+      options: { data: { nombre: data.nombre } },
     });
-    if (error || !created.user) throw new Error(error?.message ?? "No se pudo crear el usuario");
-    const uid = created.user.id;
-    const { error: e1 } = await supabaseAdmin
-      .from("usuarios")
-      .insert({ id: uid, nombre: data.nombre, email: data.email });
-    if (e1) throw new Error(e1.message);
-    const { error: e2 } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: uid, role: data.rol });
-    if (e2) throw new Error(e2.message);
+    if (signErr) throw new Error(signErr.message);
+    const uid = signUp.user?.id;
+    if (!uid) throw new Error("No se pudo crear el usuario");
+
+    // Insert profile + role via SECURITY DEFINER RPC (runs as admin caller via context.supabase).
+    const { error: rpcErr } = await context.supabase.rpc("crear_perfil_y_rol", {
+      p_uid: uid,
+      p_nombre: data.nombre,
+      p_email: data.email,
+      p_rol: data.rol,
+    });
+    if (rpcErr) throw new Error(rpcErr.message);
     return { ok: true, id: uid };
   });
 
@@ -105,7 +108,12 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await asegurarAdmin(context.supabase, context.userId);
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (!isAdmin) throw new Error("No autorizado");
+
     const patch: { nombre?: string; activo?: boolean } = {};
     if (data.nombre !== undefined) patch.nombre = data.nombre;
     if (data.activo !== undefined) patch.activo = data.activo;
@@ -113,16 +121,8 @@ export const actualizarUsuario = createServerFn({ method: "POST" })
       const { error } = await context.supabase.from("usuarios").update(patch).eq("id", data.id);
       if (error) throw new Error(error.message);
     }
-    if (data.activo !== undefined) {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.auth.admin.updateUserById(data.id, {
-        ban_duration: data.activo ? "none" : "876000h",
-      });
-    }
     return { ok: true };
   });
-
-
 
 export const cambiarRol = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -130,26 +130,10 @@ export const cambiarRol = createServerFn({ method: "POST" })
     z.object({ userId: z.string().uuid(), rol: RolEnum }).parse(d),
   )
   .handler(async ({ data, context }) => {
-    await asegurarAdmin(context.supabase, context.userId);
-    if (data.userId === context.userId && data.rol !== "admin") {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { count } = await supabaseAdmin
-        .from("user_roles")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "admin");
-      if ((count ?? 0) <= 1) {
-        throw new Error("Debe existir al menos un administrador");
-      }
-    }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error: delErr } = await supabaseAdmin
-      .from("user_roles")
-      .delete()
-      .eq("user_id", data.userId);
-    if (delErr) throw new Error(delErr.message);
-    const { error: insErr } = await supabaseAdmin
-      .from("user_roles")
-      .insert({ user_id: data.userId, role: data.rol });
-    if (insErr) throw new Error(insErr.message);
+    const { error } = await context.supabase.rpc("cambiar_rol", {
+      p_user: data.userId,
+      p_rol: data.rol,
+    });
+    if (error) throw new Error(error.message);
     return { ok: true };
   });
