@@ -1,66 +1,65 @@
--- SQL Script to enable and configure the 'productos' storage bucket in Supabase
+-- SQL Script for Supabase Storage Bucket Initialization
 
--- 1. Insert bucket 'productos' if it doesn't exist, making it public
+-- 1. Insert bucket 'productos' if it doesn't exist, making it public.
+-- This command is typically allowed in the SQL editor.
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('productos', 'productos', true)
 ON CONFLICT (id) DO NOTHING;
 
--- 2. Ensure Row Level Security is enabled on objects
-ALTER TABLE storage.objects ENABLE ROW LEVEL SECURITY;
+/*
+  =========================================
+  INSTRUCCIONES PARA CONFIGURAR POLÍTICAS (GUI)
+  =========================================
+  Si el SQL Editor de Supabase te da el error "must be owner of table objects",
+  significa que tu rol de usuario en la consola no tiene permisos directos para
+  alterar la tabla del sistema 'storage.objects' desde SQL.
 
--- 3. Policy: Allow public read access to all files in the 'productos' bucket
-CREATE POLICY "Public Read Access for Products"
-ON storage.objects FOR SELECT TO public
-USING (bucket_id = 'productos');
+  Por favor, configura las políticas de seguridad visualmente desde la consola de Supabase:
 
--- 4. Policy: Allow authenticated administrators to upload product images
-CREATE POLICY "Admin Insert Access for Products"
-ON storage.objects FOR INSERT TO authenticated
-WITH CHECK (
-  bucket_id = 'productos'
-  AND (
-    SELECT EXISTS (
-      SELECT 1 FROM public.user_roles 
-      WHERE user_roles.user_id = auth.uid() 
-      AND user_roles.role = 'admin'
-    )
-  )
-);
+  1. Ve a la sección de **Storage** en el menú lateral izquierdo de Supabase.
+  2. Selecciona **Policies** (Políticas).
+  3. Busca la sección correspondiente al bucket **productos** (o storage.objects).
+  4. Crea las siguientes políticas usando el botón **New Policy** -> **For full customization**:
 
--- 5. Policy: Allow authenticated administrators to update product images
-CREATE POLICY "Admin Update Access for Products"
-ON storage.objects FOR UPDATE TO authenticated
-USING (
-  bucket_id = 'productos'
-  AND (
-    SELECT EXISTS (
-      SELECT 1 FROM public.user_roles 
-      WHERE user_roles.user_id = auth.uid() 
-      AND user_roles.role = 'admin'
-    )
-  )
-)
-WITH CHECK (
-  bucket_id = 'productos'
-  AND (
-    SELECT EXISTS (
-      SELECT 1 FROM public.user_roles 
-      WHERE user_roles.user_id = auth.uid() 
-      AND user_roles.role = 'admin'
-    )
-  )
-);
+     ---
 
--- 6. Policy: Allow authenticated administrators to delete product images
-CREATE POLICY "Admin Delete Access for Products"
-ON storage.objects FOR DELETE TO authenticated
-USING (
-  bucket_id = 'productos'
-  AND (
-    SELECT EXISTS (
-      SELECT 1 FROM public.user_roles 
-      WHERE user_roles.user_id = auth.uid() 
-      AND user_roles.role = 'admin'
-    )
-  )
-);
+     A. POLÍTICA DE LECTURA PÚBLICA (SELECT)
+     - **Name**: "Acceso de lectura público para productos"
+     - **Allowed operations**: SELECT
+     - **Target roles**: public
+     - **USING expression**:
+       bucket_id = 'productos'
+
+     ---
+
+     B. POLÍTICA DE SUBIDA (INSERT)
+     - **Name**: "Permitir subida a administradores"
+     - **Allowed operations**: INSERT
+     - **Target roles**: authenticated
+     - **WITH CHECK expression**:
+       bucket_id = 'productos' AND auth.uid() IN (
+         SELECT user_id FROM public.user_roles WHERE role = 'admin'
+       )
+
+     ---
+
+     C. POLÍTICA DE ACTUALIZACIÓN (UPDATE)
+     - **Name**: "Permitir actualización a administradores"
+     - **Allowed operations**: UPDATE
+     - **Target roles**: authenticated
+     - **USING expression**:
+       bucket_id = 'productos' AND auth.uid() IN (
+         SELECT user_id FROM public.user_roles WHERE role = 'admin'
+       )
+
+     ---
+
+     D. POLÍTICA DE ELIMINACIÓN (DELETE)
+     - **Name**: "Permitir eliminación a administradores"
+     - **Allowed operations**: DELETE
+     - **Target roles**: authenticated
+     - **USING expression**:
+       bucket_id = 'productos' AND auth.uid() IN (
+         SELECT user_id FROM public.user_roles WHERE role = 'admin'
+       )
+*/
