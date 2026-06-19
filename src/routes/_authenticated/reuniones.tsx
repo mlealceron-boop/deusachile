@@ -103,7 +103,7 @@ function ReunionesPage() {
           .select("*, clientes:cliente_id(nombre, clinica), usuarios:ejecutivo_id(nombre)")
           .order("fecha_hora", { ascending: false }),
         supabase.from("usuarios").select("id, nombre").eq("activo", true),
-        supabase.from("clientes").select("id, nombre, clinica, ejecutivo_id").eq("estado", "activo"),
+        supabase.from("clientes").select("id, nombre, clinica, ejecutivo_id").in("estado", ["activo", "prospecto"]),
       ]);
 
       if (rErr) throw rErr;
