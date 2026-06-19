@@ -290,17 +290,65 @@ function ClientesPage() {
         </CardContent>
       </Card>
 
+      {/* Quick filters + view toggle */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { key: "todos", label: "Todos", count: clientes.length },
+            { key: "activo", label: "Activo", count: clientes.filter((c) => c.estado === "activo").length },
+            { key: "prospecto", label: "Prospecto", count: clientes.filter((c) => c.estado === "prospecto").length },
+            { key: "inactivo", label: "Inactivo", count: clientes.filter((c) => c.estado === "inactivo").length },
+          ].map((q) => {
+            const active = filtroEstado === q.key;
+            const tone =
+              q.key === "activo"
+                ? "bg-emerald-100 text-emerald-800 border-emerald-200"
+                : q.key === "prospecto"
+                  ? "bg-amber-100 text-amber-800 border-amber-200"
+                  : q.key === "inactivo"
+                    ? "bg-slate-100 text-slate-700 border-slate-200"
+                    : "bg-primary/10 text-primary border-primary/20";
+            return (
+              <button
+                key={q.key}
+                onClick={() => setFiltroEstado(q.key)}
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium transition-all ${
+                  active ? `${tone} shadow-sm scale-[1.02]` : "bg-white text-slate-600 border-border hover:bg-slate-50"
+                }`}
+              >
+                {q.label}
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${active ? "bg-white/60" : "bg-slate-100"}`}>{q.count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <div className="inline-flex rounded-md border border-border bg-white p-0.5">
+          <button
+            onClick={() => setVista("tabla")}
+            className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${vista === "tabla" ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-50"}`}
+          >
+            <List className="h-3.5 w-3.5" /> Tabla
+          </button>
+          <button
+            onClick={() => setVista("cards")}
+            className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium transition-colors ${vista === "cards" ? "bg-primary text-primary-foreground" : "text-slate-600 hover:bg-slate-50"}`}
+          >
+            <LayoutGrid className="h-3.5 w-3.5" /> Cards
+          </button>
+        </div>
+      </div>
+
       {/* List Card */}
       <Card className="border border-border shadow-sm">
         <CardHeader className="bg-slate-50/50">
           <CardTitle className="text-base text-primary">Cartera de Clientes ({clientesFiltrados.length})</CardTitle>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className={vista === "cards" ? "p-4" : "p-0"}>
           {loading ? (
             <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Cargando clientes…</div>
           ) : clientesFiltrados.length === 0 ? (
             <div className="p-8 text-center text-sm text-muted-foreground">No se encontraron clientes con los filtros aplicados.</div>
-          ) : (
+          ) : vista === "tabla" ? (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -319,13 +367,13 @@ function ClientesPage() {
                     <TableCell className="text-slate-600">{c.clinica ?? "—"}</TableCell>
                     <TableCell className="text-xs text-slate-500">{TIPO_LABEL[c.tipo]}</TableCell>
                     <TableCell>
-                      <Badge 
+                      <Badge
                         variant={c.estado === "activo" ? "default" : c.estado === "inactivo" ? "secondary" : "outline"}
                         className={
-                          c.estado === "activo" 
-                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none" 
-                            : c.estado === "inactivo" 
-                              ? "bg-slate-100 text-slate-800 hover:bg-slate-100 border-none" 
+                          c.estado === "activo"
+                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none"
+                            : c.estado === "inactivo"
+                              ? "bg-slate-100 text-slate-800 hover:bg-slate-100 border-none"
                               : "bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"
                         }
                       >
@@ -334,9 +382,9 @@ function ClientesPage() {
                     </TableCell>
                     {isAdmin && <TableCell className="text-slate-600 font-medium">{c.usuarios?.nombre ?? "—"}</TableCell>}
                     <TableCell className="text-right pr-4">
-                      <Link 
-                        to="/clientes/$id" 
-                        params={{ id: c.id }} 
+                      <Link
+                        to="/clientes/$id"
+                        params={{ id: c.id }}
                         className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                       >
                         Ver Ficha
@@ -346,6 +394,60 @@ function ClientesPage() {
                 ))}
               </TableBody>
             </Table>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {clientesFiltrados.map((c) => (
+                <div
+                  key={c.id}
+                  className="group flex flex-col gap-3 rounded-lg border border-border bg-white p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/30"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold text-slate-800">{c.nombre}</p>
+                      <p className="truncate text-xs text-slate-500">{c.clinica ?? "—"}</p>
+                    </div>
+                    <Badge
+                      className={
+                        c.estado === "activo"
+                          ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none"
+                          : c.estado === "inactivo"
+                            ? "bg-slate-100 text-slate-800 hover:bg-slate-100 border-none"
+                            : "bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"
+                      }
+                    >
+                      {ESTADO_LABEL[c.estado]}
+                    </Badge>
+                  </div>
+                  <div className="space-y-1 text-xs text-slate-600">
+                    <div className="flex items-center gap-1.5">
+                      <Filter className="h-3 w-3 text-slate-400" />
+                      <span>{TIPO_LABEL[c.tipo]}</span>
+                    </div>
+                    {c.contacto && (
+                      <div className="flex items-center gap-1.5">
+                        <Phone className="h-3 w-3 text-slate-400" />
+                        <span className="truncate">{c.contacto}</span>
+                      </div>
+                    )}
+                    {isAdmin && (
+                      <div className="flex items-center gap-1.5">
+                        <Users className="h-3 w-3 text-slate-400" />
+                        <span className="truncate">{c.usuarios?.nombre ?? "—"}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-auto flex justify-end border-t border-border pt-2">
+                    <Link
+                      to="/clientes/$id"
+                      params={{ id: c.id }}
+                      className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                    >
+                      Ver Ficha →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
