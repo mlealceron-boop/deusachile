@@ -402,7 +402,7 @@ function CatalogoPage() {
             
             {isAdmin && (
               <Button onClick={abrirNuevoProducto} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-                <Plus className="mr-1.5 h-4 w-4" /> Nuevo Producto
+                <Plus className="mr-1.5 h-4 w-4" /> Agregar SKU
               </Button>
             )}
           </div>
