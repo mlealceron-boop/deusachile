@@ -228,8 +228,8 @@ function CatalogoPage() {
   function agregarEscala() {
     const qty = parseInt(nuevaEscalaQty, 10);
     const price = parseFloat(nuevaEscalaPrice);
-    if (isNaN(qty) || qty <= 1 || isNaN(price) || price < 0) {
-      toast.error("Ingresa valores válidos (Cantidad mínima > 1, Precio >= 0)");
+    if (isNaN(qty) || qty < 1 || isNaN(price) || price < 0) {
+      toast.error("Ingresa valores válidos (Cantidad mínima >= 1, Precio >= 0)");
       return;
     }
     // Remove if already exists
