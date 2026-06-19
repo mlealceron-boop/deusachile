@@ -59,12 +59,12 @@ export function AppSidebar({ user }: Props) {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border bg-card">
-      <SidebarHeader className="px-4 py-4 border-b border-border bg-primary text-primary-foreground">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-secondary-foreground font-bold">
+      <SidebarHeader className="px-4 py-4 border-b border-border bg-primary text-primary-foreground overflow-hidden group-data-[collapsible=icon]:px-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-secondary text-secondary-foreground font-bold">
             D
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
             <span className="font-bold leading-none tracking-tight">DEUSA</span>
             <span className="text-[10px] text-secondary font-medium tracking-widest uppercase mt-0.5">
               Comercial
