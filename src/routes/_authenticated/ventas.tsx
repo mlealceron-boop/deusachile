@@ -144,7 +144,7 @@ function VentasPage() {
       const { data: cData, error: cErr } = await supabase
         .from("clientes")
         .select("id, nombre, clinica, ejecutivo_id")
-        .eq("estado", "activo"); // Only active clients can buy
+        .in("estado", ["activo", "prospecto"]); // Allow both active and prospect clients to buy
       if (cErr) throw cErr;
       setClientes(cData ?? []);
 
