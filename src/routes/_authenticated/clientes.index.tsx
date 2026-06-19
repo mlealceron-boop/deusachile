@@ -75,6 +75,7 @@ function ClientesPage() {
   const [busqueda, setBusqueda] = useState("");
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [filtroEjecutivo, setFiltroEjecutivo] = useState<string>("todos");
+  const [vista, setVista] = useState<"tabla" | "cards">("tabla");
 
   // Form state
   const [form, setForm] = useState({
