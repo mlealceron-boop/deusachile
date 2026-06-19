@@ -55,6 +55,24 @@ export type Database = {
           },
         ]
       }
+      config_comision: {
+        Row: {
+          id: string
+          porcentaje: number
+          vigente_desde: string
+        }
+        Insert: {
+          id?: string
+          porcentaje?: number
+          vigente_desde?: string
+        }
+        Update: {
+          id?: string
+          porcentaje?: number
+          vigente_desde?: string
+        }
+        Relationships: []
+      }
       interacciones: {
         Row: {
           cliente_id: string
@@ -90,6 +108,65 @@ export type Database = {
             columns: ["usuario_id"]
             isOneToOne: false
             referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marcas: {
+        Row: {
+          activo: boolean
+          creado_en: string
+          id: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          creado_en?: string
+          id?: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          creado_en?: string
+          id?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
+      productos: {
+        Row: {
+          activo: boolean
+          costo_referencia: number
+          creado_en: string
+          id: string
+          marca_id: string
+          nombre: string
+          precio_referencia: number
+        }
+        Insert: {
+          activo?: boolean
+          costo_referencia?: number
+          creado_en?: string
+          id?: string
+          marca_id: string
+          nombre: string
+          precio_referencia?: number
+        }
+        Update: {
+          activo?: boolean
+          costo_referencia?: number
+          creado_en?: string
+          id?: string
+          marca_id?: string
+          nombre?: string
+          precio_referencia?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "productos_marca_id_fkey"
+            columns: ["marca_id"]
+            isOneToOne: false
+            referencedRelation: "marcas"
             referencedColumns: ["id"]
           },
         ]
@@ -136,6 +213,115 @@ export type Database = {
         }
         Relationships: []
       }
+      venta_items: {
+        Row: {
+          cantidad: number
+          comision_item: number
+          id: string
+          precio_neto_unit: number
+          producto_id: string
+          subtotal_bruto: number
+          subtotal_neto: number
+          venta_id: string
+        }
+        Insert: {
+          cantidad: number
+          comision_item?: number
+          id?: string
+          precio_neto_unit: number
+          producto_id: string
+          subtotal_bruto?: number
+          subtotal_neto?: number
+          venta_id: string
+        }
+        Update: {
+          cantidad?: number
+          comision_item?: number
+          id?: string
+          precio_neto_unit?: number
+          producto_id?: string
+          subtotal_bruto?: number
+          subtotal_neto?: number
+          venta_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venta_items_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venta_items_venta_id_fkey"
+            columns: ["venta_id"]
+            isOneToOne: false
+            referencedRelation: "ventas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ventas: {
+        Row: {
+          cliente_id: string
+          creado_en: string
+          creado_por: string | null
+          ejecutivo_id: string
+          fecha: string
+          id: string
+          porcentaje_comision: number
+          total_bruto: number
+          total_comision: number
+          total_neto: number
+        }
+        Insert: {
+          cliente_id: string
+          creado_en?: string
+          creado_por?: string | null
+          ejecutivo_id: string
+          fecha?: string
+          id?: string
+          porcentaje_comision?: number
+          total_bruto?: number
+          total_comision?: number
+          total_neto?: number
+        }
+        Update: {
+          cliente_id?: string
+          creado_en?: string
+          creado_por?: string | null
+          ejecutivo_id?: string
+          fecha?: string
+          id?: string
+          porcentaje_comision?: number
+          total_bruto?: number
+          total_comision?: number
+          total_neto?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ventas_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ventas_creado_por_fkey"
+            columns: ["creado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ventas_ejecutivo_id_fkey"
+            columns: ["ejecutivo_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -148,6 +334,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      recalcular_venta: { Args: { p_venta_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "ejecutivo"
