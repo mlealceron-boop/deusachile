@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Search, Filter, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,12 +65,18 @@ const TIPO_LABEL: Record<TipoCliente, string> = {
 function ClientesPage() {
   const { user } = useCurrentUser();
   const isAdmin = user?.rol === "admin";
+  
   const [clientes, setClientes] = useState<ClienteRow[]>([]);
   const [ejecutivos, setEjecutivos] = useState<{ id: string; nombre: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
 
-  // form state
+  // Filter states
+  const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState<string>("todos");
+  const [filtroEjecutivo, setFiltroEjecutivo] = useState<string>("todos");
+
+  // Form state
   const [form, setForm] = useState({
     nombre: "",
     clinica: "",
@@ -100,8 +107,11 @@ function ClientesPage() {
   }, []);
 
   useEffect(() => {
-    if (isAdmin) cargarEjecutivos();
-    else if (user) setForm((f) => ({ ...f, ejecutivo_id: user.id }));
+    if (isAdmin) {
+      cargarEjecutivos();
+    } else if (user) {
+      setForm((f) => ({ ...f, ejecutivo_id: user.id }));
+    }
   }, [isAdmin, user]);
 
   async function crearCliente(e: React.FormEvent) {
@@ -137,39 +147,54 @@ function ClientesPage() {
     cargar();
   }
 
+  // Filter items reactively in frontend
+  const clientesFiltrados = clientes.filter((c) => {
+    const matchesBusqueda =
+      c.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      (c.clinica && c.clinica.toLowerCase().includes(busqueda.toLowerCase())) ||
+      (c.contacto && c.contacto.toLowerCase().includes(busqueda.toLowerCase()));
+
+    const matchesEstado = filtroEstado === "todos" || c.estado === filtroEstado;
+    const matchesEjecutivo = filtroEjecutivo === "todos" || c.ejecutivo_id === filtroEjecutivo;
+
+    return matchesBusqueda && matchesEstado && matchesEjecutivo;
+  });
+
   return (
-    <div className="mx-auto max-w-6xl space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-6xl space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Clientes</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-primary">Clientes</h1>
           <p className="text-sm text-muted-foreground">
-            {isAdmin ? "Todos los clientes de la empresa." : "Tus clientes asignados."}
+            {isAdmin ? "Todos los clientes registrados en la empresa." : "Tu cartera de clientes asignados."}
           </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Nuevo cliente</Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all hover:scale-[1.01]">
+              <Plus className="mr-2 h-4 w-4" /> Nuevo cliente
+            </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Nuevo cliente</DialogTitle>
             </DialogHeader>
-            <form onSubmit={crearCliente} className="space-y-3">
+            <form onSubmit={crearCliente} className="space-y-4">
               <div className="space-y-2">
-                <Label>Nombre</Label>
-                <Input required value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+                <Label htmlFor="nombre">Nombre Completo / Razón Social</Label>
+                <Input id="nombre" required value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} placeholder="Ej: Dr. Juan Pérez" />
               </div>
               <div className="space-y-2">
-                <Label>Clínica</Label>
-                <Input value={form.clinica} onChange={(e) => setForm({ ...form, clinica: e.target.value })} />
+                <Label htmlFor="clinica">Nombre de la Clínica</Label>
+                <Input id="clinica" value={form.clinica} onChange={(e) => setForm({ ...form, clinica: e.target.value })} placeholder="Ej: Clínica de Estética Bella" />
               </div>
               <div className="space-y-2">
-                <Label>Contacto</Label>
-                <Input value={form.contacto} onChange={(e) => setForm({ ...form, contacto: e.target.value })} placeholder="Teléfono o email" />
+                <Label htmlFor="contacto">Contacto (Teléfono o Email)</Label>
+                <Input id="contacto" value={form.contacto} onChange={(e) => setForm({ ...form, contacto: e.target.value })} placeholder="Ej: +56 9 1234 5678 o email@ejemplo.com" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Tipo</Label>
+                  <Label htmlFor="tipo">Tipo</Label>
                   <Select value={form.tipo} onValueChange={(v) => setForm({ ...form, tipo: v as TipoCliente })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -179,7 +204,7 @@ function ClientesPage() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Estado</Label>
+                  <Label htmlFor="estado">Estado</Label>
                   <Select value={form.estado} onValueChange={(v) => setForm({ ...form, estado: v as EstadoCliente })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -192,7 +217,7 @@ function ClientesPage() {
               </div>
               {isAdmin && (
                 <div className="space-y-2">
-                  <Label>Ejecutivo asignado</Label>
+                  <Label htmlFor="ejecutivo">Ejecutivo Asignado</Label>
                   <Select value={form.ejecutivo_id} onValueChange={(v) => setForm({ ...form, ejecutivo_id: v })}>
                     <SelectTrigger><SelectValue placeholder="Selecciona un ejecutivo" /></SelectTrigger>
                     <SelectContent>
@@ -203,23 +228,77 @@ function ClientesPage() {
                   </Select>
                 </div>
               )}
-              <DialogFooter>
-                <Button type="submit">Crear</Button>
+              <DialogFooter className="pt-2">
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Crear Cliente</Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Listado</CardTitle>
+      {/* Filters card */}
+      <Card className="border border-border">
+        <CardContent className="pt-6">
+          <div className="grid gap-4 md:grid-cols-4">
+            <div className="relative md:col-span-2">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre, clínica, contacto..."
+                className="pl-9 focus-visible:ring-primary"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+            
+            <div className="space-y-1">
+              <Select value={filtroEstado} onValueChange={setFiltroEstado}>
+                <SelectTrigger className="w-full">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Filtrar por estado" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los Estados</SelectItem>
+                  <SelectItem value="prospecto">Prospecto</SelectItem>
+                  <SelectItem value="activo">Activo</SelectItem>
+                  <SelectItem value="inactivo">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {isAdmin && (
+              <div className="space-y-1">
+                <Select value={filtroEjecutivo} onValueChange={setFiltroEjecutivo}>
+                  <SelectTrigger className="w-full">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-3.5 w-3.5 text-muted-foreground" />
+                      <SelectValue placeholder="Filtrar por ejecutivo" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Ejecutivos</SelectItem>
+                    {ejecutivos.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>{e.nombre}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* List Card */}
+      <Card className="border border-border shadow-sm">
+        <CardHeader className="bg-slate-50/50">
+          <CardTitle className="text-base text-primary">Cartera de Clientes ({clientesFiltrados.length})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
-            <div className="p-6 text-sm text-muted-foreground">Cargando…</div>
-          ) : clientes.length === 0 ? (
-            <div className="p-6 text-sm text-muted-foreground">Aún no hay clientes.</div>
+            <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">Cargando clientes…</div>
+          ) : clientesFiltrados.length === 0 ? (
+            <div className="p-8 text-center text-sm text-muted-foreground">No se encontraron clientes con los filtros aplicados.</div>
           ) : (
             <Table>
               <TableHeader>
@@ -228,25 +307,38 @@ function ClientesPage() {
                   <TableHead>Clínica</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Estado</TableHead>
-                  {isAdmin && <TableHead>Ejecutivo</TableHead>}
-                  <TableHead></TableHead>
+                  {isAdmin && <TableHead>Ejecutivo Asignado</TableHead>}
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {clientes.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="font-medium">{c.nombre}</TableCell>
-                    <TableCell>{c.clinica ?? "—"}</TableCell>
-                    <TableCell>{TIPO_LABEL[c.tipo]}</TableCell>
+                {clientesFiltrados.map((c) => (
+                  <TableRow key={c.id} className="hover:bg-slate-50/50">
+                    <TableCell className="font-semibold text-slate-800">{c.nombre}</TableCell>
+                    <TableCell className="text-slate-600">{c.clinica ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-slate-500">{TIPO_LABEL[c.tipo]}</TableCell>
                     <TableCell>
-                      <Badge variant={c.estado === "activo" ? "default" : c.estado === "inactivo" ? "secondary" : "outline"}>
+                      <Badge 
+                        variant={c.estado === "activo" ? "default" : c.estado === "inactivo" ? "secondary" : "outline"}
+                        className={
+                          c.estado === "activo" 
+                            ? "bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-none" 
+                            : c.estado === "inactivo" 
+                              ? "bg-slate-100 text-slate-800 hover:bg-slate-100 border-none" 
+                              : "bg-amber-100 text-amber-800 hover:bg-amber-100 border-none"
+                        }
+                      >
                         {ESTADO_LABEL[c.estado]}
                       </Badge>
                     </TableCell>
-                    {isAdmin && <TableCell>{c.usuarios?.nombre ?? "—"}</TableCell>}
-                    <TableCell className="text-right">
-                      <Link to="/clientes/$id" params={{ id: c.id }} className="text-sm text-primary hover:underline">
-                        Abrir
+                    {isAdmin && <TableCell className="text-slate-600 font-medium">{c.usuarios?.nombre ?? "—"}</TableCell>}
+                    <TableCell className="text-right pr-4">
+                      <Link 
+                        to="/clientes/$id" 
+                        params={{ id: c.id }} 
+                        className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                      >
+                        Ver Ficha
                       </Link>
                     </TableCell>
                   </TableRow>

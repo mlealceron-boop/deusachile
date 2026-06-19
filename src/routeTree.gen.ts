@@ -12,8 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVentasRouteImport } from './routes/_authenticated/ventas'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
+import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
+import { Route as AuthenticatedReunionesRouteImport } from './routes/_authenticated/reuniones'
+import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedComisionesRouteImport } from './routes/_authenticated/comisiones'
+import { Route as AuthenticatedCatalogoRouteImport } from './routes/_authenticated/catalogo'
+import { Route as AuthenticatedCapacitacionRouteImport } from './routes/_authenticated/capacitacion'
+import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedClientesIndexRouteImport } from './routes/_authenticated/clientes.index'
 import { Route as AuthenticatedClientesIdRouteImport } from './routes/_authenticated/clientes.$id'
 
@@ -31,14 +39,55 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVentasRoute = AuthenticatedVentasRouteImport.update({
+  id: '/ventas',
+  path: '/ventas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedUsuariosRoute = AuthenticatedUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
+  id: '/tareas',
+  path: '/tareas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReunionesRoute = AuthenticatedReunionesRouteImport.update({
+  id: '/reuniones',
+  path: '/reuniones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedInventarioRoute = AuthenticatedInventarioRouteImport.update({
+  id: '/inventario',
+  path: '/inventario',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedComisionesRoute = AuthenticatedComisionesRouteImport.update({
+  id: '/comisiones',
+  path: '/comisiones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCatalogoRoute = AuthenticatedCatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCapacitacionRoute =
+  AuthenticatedCapacitacionRouteImport.update({
+    id: '/capacitacion',
+    path: '/capacitacion',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedClientesIndexRoute =
@@ -56,16 +105,32 @@ const AuthenticatedClientesIdRoute = AuthenticatedClientesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/capacitacion': typeof AuthenticatedCapacitacionRoute
+  '/catalogo': typeof AuthenticatedCatalogoRoute
+  '/comisiones': typeof AuthenticatedComisionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/inventario': typeof AuthenticatedInventarioRoute
+  '/reuniones': typeof AuthenticatedReunionesRoute
+  '/tareas': typeof AuthenticatedTareasRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/ventas': typeof AuthenticatedVentasRoute
   '/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/clientes/': typeof AuthenticatedClientesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/capacitacion': typeof AuthenticatedCapacitacionRoute
+  '/catalogo': typeof AuthenticatedCatalogoRoute
+  '/comisiones': typeof AuthenticatedComisionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/inventario': typeof AuthenticatedInventarioRoute
+  '/reuniones': typeof AuthenticatedReunionesRoute
+  '/tareas': typeof AuthenticatedTareasRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
+  '/ventas': typeof AuthenticatedVentasRoute
   '/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/clientes': typeof AuthenticatedClientesIndexRoute
 }
@@ -74,8 +139,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
+  '/_authenticated/capacitacion': typeof AuthenticatedCapacitacionRoute
+  '/_authenticated/catalogo': typeof AuthenticatedCatalogoRoute
+  '/_authenticated/comisiones': typeof AuthenticatedComisionesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
+  '/_authenticated/reuniones': typeof AuthenticatedReunionesRoute
+  '/_authenticated/tareas': typeof AuthenticatedTareasRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
+  '/_authenticated/ventas': typeof AuthenticatedVentasRoute
   '/_authenticated/clientes/$id': typeof AuthenticatedClientesIdRoute
   '/_authenticated/clientes/': typeof AuthenticatedClientesIndexRoute
 }
@@ -84,19 +157,49 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/auditoria'
+    | '/capacitacion'
+    | '/catalogo'
+    | '/comisiones'
     | '/dashboard'
+    | '/inventario'
+    | '/reuniones'
+    | '/tareas'
     | '/usuarios'
+    | '/ventas'
     | '/clientes/$id'
     | '/clientes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/usuarios' | '/clientes/$id' | '/clientes'
+  to:
+    | '/'
+    | '/auth'
+    | '/auditoria'
+    | '/capacitacion'
+    | '/catalogo'
+    | '/comisiones'
+    | '/dashboard'
+    | '/inventario'
+    | '/reuniones'
+    | '/tareas'
+    | '/usuarios'
+    | '/ventas'
+    | '/clientes/$id'
+    | '/clientes'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/auditoria'
+    | '/_authenticated/capacitacion'
+    | '/_authenticated/catalogo'
+    | '/_authenticated/comisiones'
     | '/_authenticated/dashboard'
+    | '/_authenticated/inventario'
+    | '/_authenticated/reuniones'
+    | '/_authenticated/tareas'
     | '/_authenticated/usuarios'
+    | '/_authenticated/ventas'
     | '/_authenticated/clientes/$id'
     | '/_authenticated/clientes/'
   fileRoutesById: FileRoutesById
@@ -130,6 +233,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/ventas': {
+      id: '/_authenticated/ventas'
+      path: '/ventas'
+      fullPath: '/ventas'
+      preLoaderRoute: typeof AuthenticatedVentasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/usuarios': {
       id: '/_authenticated/usuarios'
       path: '/usuarios'
@@ -137,11 +247,60 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedUsuariosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tareas': {
+      id: '/_authenticated/tareas'
+      path: '/tareas'
+      fullPath: '/tareas'
+      preLoaderRoute: typeof AuthenticatedTareasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reuniones': {
+      id: '/_authenticated/reuniones'
+      path: '/reuniones'
+      fullPath: '/reuniones'
+      preLoaderRoute: typeof AuthenticatedReunionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/inventario': {
+      id: '/_authenticated/inventario'
+      path: '/inventario'
+      fullPath: '/inventario'
+      preLoaderRoute: typeof AuthenticatedInventarioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/comisiones': {
+      id: '/_authenticated/comisiones'
+      path: '/comisiones'
+      fullPath: '/comisiones'
+      preLoaderRoute: typeof AuthenticatedComisionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/catalogo': {
+      id: '/_authenticated/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof AuthenticatedCatalogoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/capacitacion': {
+      id: '/_authenticated/capacitacion'
+      path: '/capacitacion'
+      fullPath: '/capacitacion'
+      preLoaderRoute: typeof AuthenticatedCapacitacionRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/auditoria': {
+      id: '/_authenticated/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/clientes/': {
@@ -162,15 +321,31 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
+  AuthenticatedCapacitacionRoute: typeof AuthenticatedCapacitacionRoute
+  AuthenticatedCatalogoRoute: typeof AuthenticatedCatalogoRoute
+  AuthenticatedComisionesRoute: typeof AuthenticatedComisionesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
+  AuthenticatedReunionesRoute: typeof AuthenticatedReunionesRoute
+  AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
+  AuthenticatedVentasRoute: typeof AuthenticatedVentasRoute
   AuthenticatedClientesIdRoute: typeof AuthenticatedClientesIdRoute
   AuthenticatedClientesIndexRoute: typeof AuthenticatedClientesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
+  AuthenticatedCapacitacionRoute: AuthenticatedCapacitacionRoute,
+  AuthenticatedCatalogoRoute: AuthenticatedCatalogoRoute,
+  AuthenticatedComisionesRoute: AuthenticatedComisionesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
+  AuthenticatedReunionesRoute: AuthenticatedReunionesRoute,
+  AuthenticatedTareasRoute: AuthenticatedTareasRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
+  AuthenticatedVentasRoute: AuthenticatedVentasRoute,
   AuthenticatedClientesIdRoute: AuthenticatedClientesIdRoute,
   AuthenticatedClientesIndexRoute: AuthenticatedClientesIndexRoute,
 }
@@ -186,3 +361,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

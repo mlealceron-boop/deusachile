@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { Edit } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,12 +62,22 @@ function UsuariosPage() {
   const [usuarios, setUsuarios] = useState<UsuarioRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  
   const [form, setForm] = useState({
     nombre: "",
     email: "",
     password: "",
     rol: "ejecutivo" as "admin" | "ejecutivo",
   });
+  
+  const [editForm, setEditForm] = useState({
+    id: "",
+    nombre: "",
+    rol: "ejecutivo" as "admin" | "ejecutivo",
+    activo: true,
+  });
+
   const [submitting, setSubmitting] = useState(false);
 
   async function cargar() {
@@ -103,6 +114,45 @@ function UsuariosPage() {
     }
   }
 
+  function abrirEdicion(u: UsuarioRow) {
+    setEditForm({
+      id: u.id,
+      nombre: u.nombre,
+      rol: (u.rol ?? "ejecutivo") as "admin" | "ejecutivo",
+      activo: u.activo,
+    });
+    setEditOpen(true);
+  }
+
+  async function handleEditar(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      // 1. Update basic info & status
+      await actualizar({ 
+        data: { 
+          id: editForm.id, 
+          nombre: editForm.nombre, 
+          activo: editForm.activo 
+        } 
+      });
+
+      // 2. Update role if changed
+      const originalUser = usuarios.find(u => u.id === editForm.id);
+      if (originalUser && originalUser.rol !== editForm.rol) {
+        await cambiarRolFn({ data: { userId: editForm.id, rol: editForm.rol } });
+      }
+
+      toast.success("Usuario actualizado");
+      setEditOpen(false);
+      cargar();
+    } catch (err: any) {
+      toast.error(err?.message ?? "No se pudo actualizar");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function toggleActivo(u: UsuarioRow) {
     try {
       await actualizar({ data: { id: u.id, activo: !u.activo } });
@@ -113,27 +163,16 @@ function UsuariosPage() {
     }
   }
 
-  async function handleCambiarRol(u: UsuarioRow, rol: "admin" | "ejecutivo") {
-    if (u.rol === rol) return;
-    try {
-      await cambiarRolFn({ data: { userId: u.id, rol } });
-      toast.success("Rol actualizado");
-      cargar();
-    } catch (err: any) {
-      toast.error(err?.message ?? "No se pudo cambiar el rol");
-    }
-  }
-
   return (
     <div className="mx-auto max-w-5xl space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Usuarios</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-primary">Usuarios</h1>
           <p className="text-sm text-muted-foreground">Gestiona los ejecutivos del equipo.</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Nuevo usuario</Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Nuevo usuario</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -163,7 +202,7 @@ function UsuariosPage() {
                 </Select>
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={submitting}>
+                <Button type="submit" disabled={submitting} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                   {submitting ? "Creando…" : "Crear"}
                 </Button>
               </DialogFooter>
@@ -172,9 +211,46 @@ function UsuariosPage() {
         </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Equipo</CardTitle>
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar usuario</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditar} className="space-y-3">
+            <div className="space-y-2">
+              <Label>Nombre</Label>
+              <Input required value={editForm.nombre} onChange={(e) => setEditForm({ ...editForm, nombre: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Rol</Label>
+              <Select value={editForm.rol} onValueChange={(v) => setEditForm({ ...editForm, rol: v as any })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ejecutivo">Ejecutivo</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center justify-between py-2 border-t border-b border-slate-100">
+              <Label htmlFor="edit-activo">Estado Activo</Label>
+              <Switch 
+                id="edit-activo" 
+                checked={editForm.activo} 
+                onCheckedChange={(checked) => setEditForm({ ...editForm, activo: checked })} 
+              />
+            </div>
+            <DialogFooter>
+              <Button type="submit" disabled={submitting} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                {submitting ? "Guardando…" : "Guardar cambios"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Card className="border border-border">
+        <CardHeader className="bg-slate-50/50">
+          <CardTitle className="text-base text-primary">Equipo</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           {loading ? (
@@ -187,29 +263,27 @@ function UsuariosPage() {
                   <TableHead>Email</TableHead>
                   <TableHead>Rol</TableHead>
                   <TableHead>Activo</TableHead>
+                  <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {usuarios.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.nombre}</TableCell>
-                    <TableCell>{u.email}</TableCell>
+                  <TableRow key={u.id} className="hover:bg-slate-50/50">
+                    <TableCell className="font-medium text-slate-800">{u.nombre}</TableCell>
+                    <TableCell className="text-slate-600">{u.email}</TableCell>
                     <TableCell>
-                      <Select
-                        value={u.rol ?? "ejecutivo"}
-                        onValueChange={(v) => handleCambiarRol(u, v as "admin" | "ejecutivo")}
-                      >
-                        <SelectTrigger className="w-40">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ejecutivo">Ejecutivo</SelectItem>
-                          <SelectItem value="admin">Administrador</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Badge variant={u.rol === "admin" ? "default" : "secondary"} className={u.rol === "admin" ? "bg-primary text-primary-foreground" : "bg-slate-100 text-slate-700"}>
+                        {u.rol === "admin" ? "Administrador" : "Ejecutivo"}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Switch checked={u.activo} onCheckedChange={() => toggleActivo(u)} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm" onClick={() => abrirEdicion(u)} className="hover:bg-slate-100">
+                        <Edit className="h-4 w-4 mr-1 text-slate-600" />
+                        Editar
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
