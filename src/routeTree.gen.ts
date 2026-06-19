@@ -16,6 +16,7 @@ import { Route as AuthenticatedVentasRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedTareasRouteImport } from './routes/_authenticated/tareas'
 import { Route as AuthenticatedReunionesRouteImport } from './routes/_authenticated/reuniones'
+import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
 import { Route as AuthenticatedInventarioRouteImport } from './routes/_authenticated/inventario'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedComisionesRouteImport } from './routes/_authenticated/comisiones'
@@ -57,6 +58,11 @@ const AuthenticatedTareasRoute = AuthenticatedTareasRouteImport.update({
 const AuthenticatedReunionesRoute = AuthenticatedReunionesRouteImport.update({
   id: '/reuniones',
   path: '/reuniones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedRankingRoute = AuthenticatedRankingRouteImport.update({
+  id: '/ranking',
+  path: '/ranking',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedInventarioRoute = AuthenticatedInventarioRouteImport.update({
@@ -111,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/comisiones': typeof AuthenticatedComisionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inventario': typeof AuthenticatedInventarioRoute
+  '/ranking': typeof AuthenticatedRankingRoute
   '/reuniones': typeof AuthenticatedReunionesRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/comisiones': typeof AuthenticatedComisionesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inventario': typeof AuthenticatedInventarioRoute
+  '/ranking': typeof AuthenticatedRankingRoute
   '/reuniones': typeof AuthenticatedReunionesRoute
   '/tareas': typeof AuthenticatedTareasRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
@@ -145,6 +153,7 @@ export interface FileRoutesById {
   '/_authenticated/comisiones': typeof AuthenticatedComisionesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/inventario': typeof AuthenticatedInventarioRoute
+  '/_authenticated/ranking': typeof AuthenticatedRankingRoute
   '/_authenticated/reuniones': typeof AuthenticatedReunionesRoute
   '/_authenticated/tareas': typeof AuthenticatedTareasRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/comisiones'
     | '/dashboard'
     | '/inventario'
+    | '/ranking'
     | '/reuniones'
     | '/tareas'
     | '/usuarios'
@@ -179,6 +189,7 @@ export interface FileRouteTypes {
     | '/comisiones'
     | '/dashboard'
     | '/inventario'
+    | '/ranking'
     | '/reuniones'
     | '/tareas'
     | '/usuarios'
@@ -196,6 +207,7 @@ export interface FileRouteTypes {
     | '/_authenticated/comisiones'
     | '/_authenticated/dashboard'
     | '/_authenticated/inventario'
+    | '/_authenticated/ranking'
     | '/_authenticated/reuniones'
     | '/_authenticated/tareas'
     | '/_authenticated/usuarios'
@@ -259,6 +271,13 @@ declare module '@tanstack/react-router' {
       path: '/reuniones'
       fullPath: '/reuniones'
       preLoaderRoute: typeof AuthenticatedReunionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ranking': {
+      id: '/_authenticated/ranking'
+      path: '/ranking'
+      fullPath: '/ranking'
+      preLoaderRoute: typeof AuthenticatedRankingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/inventario': {
@@ -327,6 +346,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedComisionesRoute: typeof AuthenticatedComisionesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInventarioRoute: typeof AuthenticatedInventarioRoute
+  AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
   AuthenticatedReunionesRoute: typeof AuthenticatedReunionesRoute
   AuthenticatedTareasRoute: typeof AuthenticatedTareasRoute
   AuthenticatedUsuariosRoute: typeof AuthenticatedUsuariosRoute
@@ -342,6 +362,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedComisionesRoute: AuthenticatedComisionesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInventarioRoute: AuthenticatedInventarioRoute,
+  AuthenticatedRankingRoute: AuthenticatedRankingRoute,
   AuthenticatedReunionesRoute: AuthenticatedReunionesRoute,
   AuthenticatedTareasRoute: AuthenticatedTareasRoute,
   AuthenticatedUsuariosRoute: AuthenticatedUsuariosRoute,
@@ -361,3 +382,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

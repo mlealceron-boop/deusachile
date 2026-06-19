@@ -11,7 +11,8 @@ import {
   Package, 
   TrendingUp, 
   GraduationCap, 
-  History 
+  History,
+  Trophy
 } from "lucide-react";
 import {
   Sidebar,
@@ -46,7 +47,8 @@ export function AppSidebar({ user }: Props) {
     { title: "Tareas", url: "/tareas", icon: ClipboardList, show: true },
     { title: "Reuniones", url: "/reuniones", icon: Calendar, show: true },
     { title: "Inventario", url: "/inventario", icon: Package, show: isAdmin },
-    { title: "Comisiones", url: "/comisiones", icon: TrendingUp, show: isAdmin },
+    { title: "Comisiones", url: "/comisiones", icon: TrendingUp, show: true },
+    { title: "Ranking", url: "/ranking", icon: Trophy, show: true },
     { title: "Capacitación", url: "/capacitacion", icon: GraduationCap, show: true },
     { title: "Usuarios", url: "/usuarios", icon: UserCog, show: isAdmin },
     { title: "Auditoría", url: "/auditoria", icon: History, show: isAdmin },
