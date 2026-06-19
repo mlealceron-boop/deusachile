@@ -129,7 +129,7 @@ function VentasPage() {
         .select("*, clientes:cliente_id(nombre, clinica), usuarios:ejecutivo_id(nombre), venta_items(id)")
         .order("fecha", { ascending: false });
       if (vErr) throw vErr;
-      setVentas(vData ?? []);
+      setVentas((vData as any) ?? []);
 
       // 2. Fetch active products
       const { data: pData, error: pErr } = await supabase
