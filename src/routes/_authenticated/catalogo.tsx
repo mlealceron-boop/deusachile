@@ -108,7 +108,10 @@ function CatalogoPage() {
     try {
       const productosQuery = isAdmin
         ? supabase.rpc("get_productos_admin")
-        : supabase.from("productos").select("*").order("nombre");
+        : supabase
+            .from("productos")
+            .select("id,marca_id,nombre,precio_referencia,activo,creado_en")
+            .order("nombre");
 
       const [{ data: mData, error: mErr }, { data: pRaw, error: pErr }] = await Promise.all([
         supabase.from("marcas").select("*").order("nombre"),
@@ -133,17 +136,12 @@ function CatalogoPage() {
       setMarcas(marcasList);
       setProductos(productosList);
 
-      const pData = productosList;
-
       // Load image URLs dynamically
       const urls: Record<string, string> = {};
-      if (pData) {
-        for (const prod of pData) {
-          const { data } = supabase.storage.from("productos").getPublicUrl(`${prod.id}.png`);
-          if (data?.publicUrl) {
-            // Check cache buster to refresh
-            urls[prod.id] = `${data.publicUrl}?t=${new Date(prod.creado_en).getTime()}`;
-          }
+      for (const prod of productosList) {
+        const { data } = supabase.storage.from("productos").getPublicUrl(`${prod.id}.png`);
+        if (data?.publicUrl) {
+          urls[prod.id] = `${data.publicUrl}?t=${new Date(prod.creado_en).getTime()}`;
         }
       }
       setProductoImages(urls);
@@ -155,8 +153,10 @@ function CatalogoPage() {
   }
 
   useEffect(() => {
+    if (!user) return;
     cargarDatos();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, isAdmin]);
 
   // --- MARCAS HANDLERS ---
   function abrirNuevaMarca() {
