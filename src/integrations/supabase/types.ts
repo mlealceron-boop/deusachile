@@ -112,6 +112,41 @@ export type Database = {
           },
         ]
       }
+      inventario: {
+        Row: {
+          actualizado_en: string
+          costo_promedio: number
+          id: string
+          producto_id: string
+          stock_actual: number
+          stock_minimo: number
+        }
+        Insert: {
+          actualizado_en?: string
+          costo_promedio?: number
+          id?: string
+          producto_id: string
+          stock_actual?: number
+          stock_minimo?: number
+        }
+        Update: {
+          actualizado_en?: string
+          costo_promedio?: number
+          id?: string
+          producto_id?: string
+          stock_actual?: number
+          stock_minimo?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventario_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: true
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marcas: {
         Row: {
           activo: boolean
@@ -132,6 +167,60 @@ export type Database = {
           nombre?: string
         }
         Relationships: []
+      }
+      movimientos_inventario: {
+        Row: {
+          cantidad: number
+          costo_promedio_resultante: number
+          costo_unitario: number
+          fecha: string
+          id: string
+          nota: string | null
+          producto_id: string
+          referencia_id: string | null
+          tipo: string
+          usuario_id: string | null
+        }
+        Insert: {
+          cantidad: number
+          costo_promedio_resultante?: number
+          costo_unitario?: number
+          fecha?: string
+          id?: string
+          nota?: string | null
+          producto_id: string
+          referencia_id?: string | null
+          tipo: string
+          usuario_id?: string | null
+        }
+        Update: {
+          cantidad?: number
+          costo_promedio_resultante?: number
+          costo_unitario?: number
+          fecha?: string
+          id?: string
+          nota?: string | null
+          producto_id?: string
+          referencia_id?: string | null
+          tipo?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimientos_inventario_producto_id_fkey"
+            columns: ["producto_id"]
+            isOneToOne: false
+            referencedRelation: "productos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "movimientos_inventario_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       productos: {
         Row: {
@@ -477,6 +566,35 @@ export type Database = {
         Returns: boolean
       }
       recalcular_venta: { Args: { p_venta_id: string }; Returns: undefined }
+      registrar_ajuste_stock: {
+        Args: {
+          p_cantidad: number
+          p_nota: string
+          p_producto_id: string
+          p_tipo: string
+          p_usuario_id: string
+        }
+        Returns: undefined
+      }
+      registrar_entrada_stock: {
+        Args: {
+          p_cantidad: number
+          p_costo_unitario: number
+          p_nota: string
+          p_producto_id: string
+          p_usuario_id: string
+        }
+        Returns: undefined
+      }
+      registrar_salida_venta: {
+        Args: {
+          p_cantidad: number
+          p_producto_id: string
+          p_usuario_id: string
+          p_venta_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "ejecutivo"
