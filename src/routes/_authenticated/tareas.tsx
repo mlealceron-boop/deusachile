@@ -65,7 +65,7 @@ function TareasPage() {
 
   const [tareas, setTareas] = useState<TareaRow[]>([]);
   const [ejecutivos, setEjecutivos] = useState<{ id: string; nombre: string }[]>([]);
-  const [clientes, setClientes] = useState<{ id: string; nombre: string; clinica: string | null }[]>([]);
+  const [clientes, setClientes] = useState<{ id: string; nombre: string; clinica: string | null; ejecutivo_id: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
