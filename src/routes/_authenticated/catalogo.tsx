@@ -123,8 +123,7 @@ function CatalogoPage() {
         for (const prod of pData) {
           const { data } = supabase.storage.from("productos").getPublicUrl(`${prod.id}.png`);
           if (data?.publicUrl) {
-            // Check cache buster to refresh
-            urls[prod.id] = `${data.publicUrl}?t=${new Date(prod.creado_en).getTime()}`;
+            urls[prod.id] = `${data.publicUrl}?t=${Date.now()}`;
           }
         }
       }
