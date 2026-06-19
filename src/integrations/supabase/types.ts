@@ -359,13 +359,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "venta_items_producto_id_fkey"
-            columns: ["producto_id"]
-            isOneToOne: false
-            referencedRelation: "productos_publicos"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "venta_items_venta_id_fkey"
             columns: ["venta_id"]
             isOneToOne: false
@@ -437,41 +430,7 @@ export type Database = {
       }
     }
     Views: {
-      productos_publicos: {
-        Row: {
-          activo: boolean | null
-          creado_en: string | null
-          id: string | null
-          marca_id: string | null
-          nombre: string | null
-          precio_referencia: number | null
-        }
-        Insert: {
-          activo?: boolean | null
-          creado_en?: string | null
-          id?: string | null
-          marca_id?: string | null
-          nombre?: string | null
-          precio_referencia?: number | null
-        }
-        Update: {
-          activo?: boolean | null
-          creado_en?: string | null
-          id?: string | null
-          marca_id?: string | null
-          nombre?: string | null
-          precio_referencia?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "productos_marca_id_fkey"
-            columns: ["marca_id"]
-            isOneToOne: false
-            referencedRelation: "marcas"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       any_admin_exists: { Args: never; Returns: boolean }
@@ -491,6 +450,24 @@ export type Database = {
           p_uid: string
         }
         Returns: undefined
+      }
+      get_productos_admin: {
+        Args: never
+        Returns: {
+          activo: boolean
+          costo_referencia: number
+          creado_en: string
+          id: string
+          marca_id: string
+          nombre: string
+          precio_referencia: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "productos"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       has_role: {
         Args: {
