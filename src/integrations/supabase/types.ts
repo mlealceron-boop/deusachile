@@ -327,6 +327,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      any_admin_exists: { Args: never; Returns: boolean }
+      bootstrap_admin: {
+        Args: { p_email: string; p_nombre: string }
+        Returns: undefined
+      }
+      cambiar_rol: {
+        Args: { p_rol: Database["public"]["Enums"]["app_role"]; p_user: string }
+        Returns: undefined
+      }
+      crear_perfil_y_rol: {
+        Args: {
+          p_email: string
+          p_nombre: string
+          p_rol: Database["public"]["Enums"]["app_role"]
+          p_uid: string
+        }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
