@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      auditoria: {
+        Row: {
+          accion: string
+          detalle: Json | null
+          fecha: string
+          id: string
+          registro_id: string | null
+          tabla_afectada: string
+          usuario_id: string | null
+        }
+        Insert: {
+          accion: string
+          detalle?: Json | null
+          fecha?: string
+          id?: string
+          registro_id?: string | null
+          tabla_afectada: string
+          usuario_id?: string | null
+        }
+        Update: {
+          accion?: string
+          detalle?: Json | null
+          fecha?: string
+          id?: string
+          registro_id?: string | null
+          tabla_afectada?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auditoria_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clientes: {
         Row: {
           clinica: string | null
@@ -168,6 +206,36 @@ export type Database = {
         }
         Relationships: []
       }
+      modulos_capacitacion: {
+        Row: {
+          activo: boolean
+          creado_en: string
+          descripcion: string | null
+          dirigido_a: Database["public"]["Enums"]["dirigido_a_rol"]
+          id: string
+          link_externo: string
+          nombre: string
+        }
+        Insert: {
+          activo?: boolean
+          creado_en?: string
+          descripcion?: string | null
+          dirigido_a?: Database["public"]["Enums"]["dirigido_a_rol"]
+          id?: string
+          link_externo: string
+          nombre: string
+        }
+        Update: {
+          activo?: boolean
+          creado_en?: string
+          descripcion?: string | null
+          dirigido_a?: Database["public"]["Enums"]["dirigido_a_rol"]
+          id?: string
+          link_externo?: string
+          nombre?: string
+        }
+        Relationships: []
+      }
       movimientos_inventario: {
         Row: {
           cantidad: number
@@ -256,6 +324,55 @@ export type Database = {
             columns: ["marca_id"]
             isOneToOne: false
             referencedRelation: "marcas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      progreso_capacitacion: {
+        Row: {
+          actualizado_en: string
+          cliente_id: string | null
+          estado: Database["public"]["Enums"]["estado_progreso"]
+          id: string
+          modulo_id: string
+          usuario_id: string | null
+        }
+        Insert: {
+          actualizado_en?: string
+          cliente_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_progreso"]
+          id?: string
+          modulo_id: string
+          usuario_id?: string | null
+        }
+        Update: {
+          actualizado_en?: string
+          cliente_id?: string | null
+          estado?: Database["public"]["Enums"]["estado_progreso"]
+          id?: string
+          modulo_id?: string
+          usuario_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "progreso_capacitacion_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progreso_capacitacion_modulo_id_fkey"
+            columns: ["modulo_id"]
+            isOneToOne: false
+            referencedRelation: "modulos_capacitacion"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "progreso_capacitacion_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
         ]
@@ -598,7 +715,9 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "ejecutivo"
+      dirigido_a_rol: "cliente" | "ejecutivo" | "ambos"
       estado_cliente: "prospecto" | "activo" | "inactivo"
+      estado_progreso: "no_iniciado" | "en_curso" | "completado"
       estado_reunion: "agendada" | "realizada" | "cancelada"
       estado_tarea: "pendiente" | "en_curso" | "completada"
       tipo_cliente: "clinica_propia" | "recien_empieza"
@@ -730,7 +849,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "ejecutivo"],
+      dirigido_a_rol: ["cliente", "ejecutivo", "ambos"],
       estado_cliente: ["prospecto", "activo", "inactivo"],
+      estado_progreso: ["no_iniciado", "en_curso", "completado"],
       estado_reunion: ["agendada", "realizada", "cancelada"],
       estado_tarea: ["pendiente", "en_curso", "completada"],
       tipo_cliente: ["clinica_propia", "recien_empieza"],

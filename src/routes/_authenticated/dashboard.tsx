@@ -14,6 +14,8 @@ import {
   TrendingUp, 
   DollarSign, 
   ShoppingBag, 
+  ShoppingCart,
+  ShieldAlert,
   Percent, 
   AlertTriangle, 
   Calendar, 
