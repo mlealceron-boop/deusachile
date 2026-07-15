@@ -144,6 +144,31 @@ function ClientesPage() {
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [filtroEjecutivo, setFiltroEjecutivo] = useState<string>("todos");
   const [vista, setVista] = useState<"tabla" | "cards">("tabla");
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
+
+  function toggleSeleccion(id: string) {
+    setSeleccionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  async function eliminarClientes(ids: string[]) {
+    if (ids.length === 0) return;
+    const msg = ids.length === 1
+      ? "¿Eliminar esta ficha de cliente? Esta acción no se puede deshacer."
+      : `¿Eliminar ${ids.length} fichas de clientes? Esta acción no se puede deshacer.`;
+    if (!window.confirm(msg)) return;
+    const { error } = await supabase.from("clientes").delete().in("id", ids);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(ids.length === 1 ? "Cliente eliminado" : `${ids.length} clientes eliminados`);
+    setSeleccionados(new Set());
+    cargar();
+  }
 
   // Form state
   const [form, setForm] = useState({
