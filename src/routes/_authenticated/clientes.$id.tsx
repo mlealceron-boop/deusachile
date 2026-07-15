@@ -36,6 +36,14 @@ interface Cliente {
   nivel: string | null;
   interes: string | null;
   notas: string | null;
+  rut: string | null;
+  email: string | null;
+  telefono: string | null;
+  region: string | null;
+  ciudad: string | null;
+  comuna: string | null;
+  direccion: string | null;
+  rss: string | null;
 }
 
 interface Interaccion {
