@@ -58,11 +58,16 @@ export type Database = {
           clinica: string | null
           contacto: string | null
           creado_en: string
+          direccion: string | null
           ejecutivo_id: string
+          email: string | null
           estado: Database["public"]["Enums"]["estado_cliente"]
           id: string
           nombre: string
           region: string | null
+          rss: string | null
+          rut: string | null
+          telefono: string | null
           tipo: Database["public"]["Enums"]["tipo_cliente"]
         }
         Insert: {
@@ -70,11 +75,16 @@ export type Database = {
           clinica?: string | null
           contacto?: string | null
           creado_en?: string
+          direccion?: string | null
           ejecutivo_id: string
+          email?: string | null
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
           nombre: string
           region?: string | null
+          rss?: string | null
+          rut?: string | null
+          telefono?: string | null
           tipo?: Database["public"]["Enums"]["tipo_cliente"]
         }
         Update: {
@@ -82,11 +92,16 @@ export type Database = {
           clinica?: string | null
           contacto?: string | null
           creado_en?: string
+          direccion?: string | null
           ejecutivo_id?: string
+          email?: string | null
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
           nombre?: string
           region?: string | null
+          rss?: string | null
+          rut?: string | null
+          telefono?: string | null
           tipo?: Database["public"]["Enums"]["tipo_cliente"]
         }
         Relationships: [
