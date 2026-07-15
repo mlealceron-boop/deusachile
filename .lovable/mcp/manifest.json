@@ -1,0 +1,145 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://yshwecsfoqzmuvsplgsk.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "deusa-mcp",
+      "version": "0.1.0",
+      "title": "DEUSA · Comercial"
+    },
+    "tools": [
+      {
+        "name": "list_clientes",
+        "title": "Listar clientes",
+        "description": "Lista los clientes de DEUSA visibles para el usuario autenticado. Filtra opcionalmente por estado (activo, prospecto, inactivo) y limita la cantidad de resultados.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "estado": {
+              "type": "string",
+              "enum": [
+                "activo",
+                "prospecto",
+                "inactivo"
+              ],
+              "description": "Filtro opcional por estado del cliente."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Máximo de filas (por defecto 50)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_ventas",
+        "title": "Listar ventas recientes",
+        "description": "Lista las ventas visibles para el usuario autenticado, ordenadas por fecha descendente. Incluye totales neto, bruto y comisión.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "description": "Máximo de filas (por defecto 20)."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_mis_tareas",
+        "title": "Listar mis tareas",
+        "description": "Devuelve las tareas asignadas al usuario autenticado, opcionalmente filtradas por estado.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "estado": {
+              "type": "string",
+              "enum": [
+                "pendiente",
+                "en_progreso",
+                "completada"
+              ],
+              "description": "Filtro opcional por estado de la tarea."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_tarea",
+        "title": "Crear tarea",
+        "description": "Crea una nueva tarea asignada al usuario autenticado. Permite adjuntar descripción, cliente relacionado y fecha límite (ISO 8601).",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "titulo": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Título breve de la tarea."
+            },
+            "descripcion": {
+              "type": "string",
+              "description": "Detalle opcional de la tarea."
+            },
+            "cliente_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "UUID del cliente relacionado (opcional)."
+            },
+            "fecha_limite": {
+              "type": "string",
+              "format": "date-time",
+              "description": "Fecha límite ISO 8601 (opcional)."
+            }
+          },
+          "required": [
+            "titulo"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
