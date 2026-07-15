@@ -12,17 +12,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { adminExiste, bootstrapAdmin } from "@/lib/users.functions";
 
+function isSafeNext(value: unknown): value is string {
+  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//");
+}
+
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  beforeLoad: async () => {
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: isSafeNext(s.next) ? s.next : undefined,
+  }),
+  beforeLoad: async ({ search }) => {
     const { data } = await supabase.auth.getUser();
-    if (data.user) throw redirect({ to: "/dashboard" });
+    if (data.user) {
+      if (search.next) throw redirect({ href: search.next });
+      throw redirect({ to: "/dashboard" });
+    }
   },
   component: AuthPage,
 });
 
 function AuthPage() {
   const router = useRouter();
+  const { next } = Route.useSearch();
   const checkAdmin = useServerFn(adminExiste);
   const bootstrap = useServerFn(bootstrapAdmin);
 
@@ -37,6 +48,14 @@ function AuthPage() {
     checkAdmin().then((r) => setHayAdmin(r.existe)).catch(() => setHayAdmin(true));
   }, [checkAdmin]);
 
+  function goPostAuth() {
+    if (next) {
+      window.location.href = next;
+      return;
+    }
+    router.navigate({ to: "/dashboard", replace: true });
+  }
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -47,13 +66,16 @@ function AuthPage() {
       return;
     }
     toast.success("Sesión iniciada");
-    router.navigate({ to: "/dashboard", replace: true });
+    goPostAuth();
   }
 
   async function handleGoogleSignIn() {
     setLoading(true);
+    const redirectUri = next
+      ? `${window.location.origin}/auth?next=${encodeURIComponent(next)}`
+      : window.location.origin;
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: redirectUri,
     });
     setLoading(false);
     if (result.error) {
@@ -65,7 +87,7 @@ function AuthPage() {
       return;
     }
     toast.success("Sesión iniciada");
-    router.navigate({ to: "/dashboard", replace: true });
+    goPostAuth();
   }
 
   async function handleBootstrap(e: React.FormEvent) {
@@ -76,7 +98,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Administrador creado");
-      router.navigate({ to: "/dashboard", replace: true });
+      goPostAuth();
     } catch (err: any) {
       toast.error(err?.message ?? "No se pudo crear el administrador");
     } finally {
