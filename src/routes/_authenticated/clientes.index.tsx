@@ -170,6 +170,7 @@ function ClientesPage() {
       tipo: form.tipo,
       estado: form.estado,
       region: form.region || null,
+      ciudad: form.ciudad || null,
       ejecutivo_id,
     });
     if (error) {
@@ -185,6 +186,7 @@ function ClientesPage() {
       tipo: "recien_empieza",
       estado: "prospecto",
       region: "",
+      ciudad: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
     cargar();
