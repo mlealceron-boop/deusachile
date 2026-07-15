@@ -167,6 +167,9 @@ export async function importarClientes(
       region: norm(r.region) || null,
       ciudad: norm(r.ciudad) || null,
       comuna: norm(r.comuna) || null,
+      nivel: norm(r.nivel) || null,
+      interes: norm(r.interes) || null,
+      notas: norm(r.notas) || null,
       ejecutivo_id,
     });
   });
