@@ -238,6 +238,17 @@ function ClientesPage() {
                   </Select>
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="region">Región</Label>
+                <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecciona una región" /></SelectTrigger>
+                  <SelectContent>
+                    {REGIONES_CHILE.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {isAdmin && (
                 <div className="space-y-2">
                   <Label htmlFor="ejecutivo">Ejecutivo Asignado</Label>
