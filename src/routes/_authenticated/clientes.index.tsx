@@ -186,6 +186,9 @@ function ClientesPage() {
     region: "",
     ciudad: "",
     comuna: "",
+    nivel: "",
+    interes: "",
+    notas: "",
     ejecutivo_id: "",
   });
 
@@ -241,6 +244,9 @@ function ClientesPage() {
       region: form.region || null,
       ciudad: form.ciudad || null,
       comuna: form.comuna || form.ciudad || null,
+      nivel: form.nivel || null,
+      interes: form.interes || null,
+      notas: form.notas || null,
       ejecutivo_id,
     });
     if (error) {
@@ -262,6 +268,9 @@ function ClientesPage() {
       region: "",
       ciudad: "",
       comuna: "",
+      nivel: "",
+      interes: "",
+      notas: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
 
