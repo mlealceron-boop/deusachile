@@ -33,6 +33,9 @@ interface Cliente {
   tipo: TipoCliente;
   estado: EstadoCliente;
   ejecutivo_id: string;
+  nivel: string | null;
+  interes: string | null;
+  notas: string | null;
 }
 
 interface Interaccion {
@@ -96,6 +99,9 @@ function ClienteDetalle() {
       contacto: cliente.contacto,
       tipo: cliente.tipo,
       estado: cliente.estado,
+      nivel: cliente.nivel,
+      interes: cliente.interes,
+      notas: cliente.notas,
     };
     if (isAdmin) {
       updates.ejecutivo_id = cliente.ejecutivo_id;
@@ -198,6 +204,18 @@ function ClienteDetalle() {
                   </Select>
                 </div>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="nivel">Nivel</Label>
+                <Input id="nivel" value={cliente.nivel ?? ""} onChange={(e) => setCliente({ ...cliente, nivel: e.target.value })} placeholder="Ej. Alto, Medio, Bajo" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interes">Interés</Label>
+                <Input id="interes" value={cliente.interes ?? ""} onChange={(e) => setCliente({ ...cliente, interes: e.target.value })} placeholder="Ej. Compra inmediata, Futuro" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea id="notas" value={cliente.notas ?? ""} onChange={(e) => setCliente({ ...cliente, notas: e.target.value })} placeholder="Observaciones generales del cliente..." rows={3} />
+              </div>
             </div>
             <div className="flex justify-end pt-2">
               <Button onClick={guardar} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
@@ -233,6 +251,24 @@ function ClienteDetalle() {
               <span className="text-muted-foreground">Interacciones:</span>
               <span className="font-semibold text-slate-700">{interacciones.length}</span>
             </div>
+            {cliente.nivel && (
+              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span className="text-muted-foreground">Nivel:</span>
+                <span className="font-semibold text-slate-700">{cliente.nivel}</span>
+              </div>
+            )}
+            {cliente.interes && (
+              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span className="text-muted-foreground">Interés:</span>
+                <span className="font-semibold text-slate-700">{cliente.interes}</span>
+              </div>
+            )}
+            {cliente.notas && (
+              <div className="pt-2">
+                <span className="text-muted-foreground block mb-1">Notas:</span>
+                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{cliente.notas}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
