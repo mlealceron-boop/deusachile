@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Search, Filter, Plus, Users, LayoutGrid, List, Phone } from "lucide-react";
+import { Search, Filter, Plus, Users, LayoutGrid, List, Phone, Trash2 } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -143,6 +144,31 @@ function ClientesPage() {
   const [filtroEstado, setFiltroEstado] = useState<string>("todos");
   const [filtroEjecutivo, setFiltroEjecutivo] = useState<string>("todos");
   const [vista, setVista] = useState<"tabla" | "cards">("tabla");
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
+
+  function toggleSeleccion(id: string) {
+    setSeleccionados((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  async function eliminarClientes(ids: string[]) {
+    if (ids.length === 0) return;
+    const msg = ids.length === 1
+      ? "¿Eliminar esta ficha de cliente? Esta acción no se puede deshacer."
+      : `¿Eliminar ${ids.length} fichas de clientes? Esta acción no se puede deshacer.`;
+    if (!window.confirm(msg)) return;
+    const { error } = await supabase.from("clientes").delete().in("id", ids);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(ids.length === 1 ? "Cliente eliminado" : `${ids.length} clientes eliminados`);
+    setSeleccionados(new Set());
+    cargar();
+  }
 
   // Form state
   const [form, setForm] = useState({
@@ -508,6 +534,27 @@ function ClientesPage() {
         </div>
       </div>
 
+      {/* Bulk actions bar (admin, table view) */}
+      {isAdmin && vista === "tabla" && seleccionados.size > 0 && (
+        <div className="flex items-center justify-between rounded-md border border-destructive/30 bg-destructive/5 px-4 py-2">
+          <span className="text-sm font-medium text-destructive">
+            {seleccionados.size} cliente{seleccionados.size === 1 ? "" : "s"} seleccionado{seleccionados.size === 1 ? "" : "s"}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setSeleccionados(new Set())}>
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => eliminarClientes(Array.from(seleccionados))}
+            >
+              <Trash2 className="mr-2 h-4 w-4" /> Eliminar seleccionados
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* List Card */}
       <Card className="border border-border shadow-sm">
         <CardHeader className="bg-slate-50/50">
@@ -522,6 +569,21 @@ function ClientesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
+                  {isAdmin && (
+                    <TableHead className="w-10 pl-4">
+                      <Checkbox
+                        checked={
+                          clientesFiltrados.length > 0 &&
+                          clientesFiltrados.every((c) => seleccionados.has(c.id))
+                        }
+                        onCheckedChange={(v) => {
+                          if (v) setSeleccionados(new Set(clientesFiltrados.map((c) => c.id)));
+                          else setSeleccionados(new Set());
+                        }}
+                        aria-label="Seleccionar todos"
+                      />
+                    </TableHead>
+                  )}
                   <TableHead>Nombre</TableHead>
                   <TableHead>Clínica</TableHead>
                   <TableHead>Tipo</TableHead>
@@ -532,7 +594,16 @@ function ClientesPage() {
               </TableHeader>
               <TableBody>
                 {clientesFiltrados.map((c) => (
-                  <TableRow key={c.id} className="hover:bg-slate-50/50">
+                  <TableRow key={c.id} className="hover:bg-slate-50/50" data-state={seleccionados.has(c.id) ? "selected" : undefined}>
+                    {isAdmin && (
+                      <TableCell className="pl-4">
+                        <Checkbox
+                          checked={seleccionados.has(c.id)}
+                          onCheckedChange={() => toggleSeleccion(c.id)}
+                          aria-label={`Seleccionar ${c.nombre}`}
+                        />
+                      </TableCell>
+                    )}
                     <TableCell className="font-semibold text-slate-800">{c.nombre}</TableCell>
                     <TableCell className="text-slate-600">{c.clinica ?? "—"}</TableCell>
                     <TableCell className="text-xs text-slate-500">{TIPO_LABEL[c.tipo]}</TableCell>
@@ -552,18 +623,33 @@ function ClientesPage() {
                     </TableCell>
                     {isAdmin && <TableCell className="text-slate-600 font-medium">{c.usuarios?.nombre ?? "—"}</TableCell>}
                     <TableCell className="text-right pr-4">
-                      <Link
-                        to="/clientes/$id"
-                        params={{ id: c.id }}
-                        className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-                      >
-                        Ver Ficha
-                      </Link>
+                      <div className="inline-flex items-center gap-3">
+                        <Link
+                          to="/clientes/$id"
+                          params={{ id: c.id }}
+                          className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
+                        >
+                          Ver Ficha
+                        </Link>
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => eliminarClientes([c.id])}
+                            aria-label={`Eliminar ${c.nombre}`}
+                            title="Eliminar cliente"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {clientesFiltrados.map((c) => (
