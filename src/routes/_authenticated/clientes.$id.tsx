@@ -33,6 +33,9 @@ interface Cliente {
   tipo: TipoCliente;
   estado: EstadoCliente;
   ejecutivo_id: string;
+  nivel: string | null;
+  interes: string | null;
+  notas: string | null;
 }
 
 interface Interaccion {
