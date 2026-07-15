@@ -100,6 +100,35 @@ const CIUDADES_POR_REGION: Record<string, string[]> = {
   "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Puerto Williams", "Cabo de Hornos"],
 };
 
+// Comunas para ciudades que agrupan más de una comuna (principalmente conurbaciones).
+// Las ciudades no listadas se consideran ciudad = comuna (dropdown deshabilitado).
+const COMUNAS_POR_CIUDAD: Record<string, string[]> = {
+  "Santiago": [
+    "Santiago Centro", "Estación Central", "Independencia", "Recoleta", "Quinta Normal",
+    "Pedro Aguirre Cerda", "San Miguel", "San Joaquín", "San Ramón", "La Cisterna",
+    "Lo Espejo", "Cerrillos", "Renca", "Cerro Navia", "Lo Prado", "Pudahuel",
+    "Huechuraba", "Conchalí",
+  ],
+  "Valparaíso": ["Valparaíso", "Playa Ancha", "Cerro Alegre", "Cerro Concepción", "Placilla"],
+  "Viña del Mar": ["Viña del Mar", "Reñaca", "Forestal", "Miraflores", "Recreo", "Chorrillos"],
+  "Concepción": ["Concepción", "Barrio Universitario", "Pedro de Valdivia", "Lorenzo Arenas"],
+  "Temuco": ["Temuco Centro", "Amanecer", "Labranza", "Pueblo Nuevo"],
+  "La Serena": ["La Serena Centro", "Las Compañías", "La Pampa"],
+  "Antofagasta": ["Antofagasta Centro", "Coviefi", "La Chimba", "Huáscar"],
+  "Iquique": ["Iquique Centro", "Cavancha", "Playa Brava"],
+  "Puerto Montt": ["Puerto Montt Centro", "Alerce", "Mirasol", "Puerto Chico"],
+  "Rancagua": ["Rancagua Centro", "Rancagua Norte", "Rancagua Sur"],
+  "Talca": ["Talca Centro", "Talca Oriente", "Talca Poniente"],
+  "Chillán": ["Chillán Centro", "Chillán Oriente", "Chillán Poniente"],
+  "Osorno": ["Osorno Centro", "Rahue Alto", "Rahue Bajo", "Ovejería"],
+  "Valdivia": ["Valdivia Centro", "Isla Teja", "Las Ánimas", "Collico"],
+  "Copiapó": ["Copiapó Centro", "Paipote", "San Fernando"],
+  "Punta Arenas": ["Punta Arenas Centro", "Barrio Sur", "Barrio Prat"],
+  "Arica": ["Arica Centro", "Chinchorro", "San Miguel de Azapa"],
+  "Coyhaique": ["Coyhaique Centro", "Coyhaique Alto"],
+};
+
+
 function ClientesPage() {
   const { user } = useCurrentUser();
   const isAdmin = user?.rol === "admin";
