@@ -860,7 +860,12 @@ function VentasPage() {
             {/* Header breakdown */}
             <Card className="md:col-span-2 border border-border shadow-sm">
               <CardHeader className="bg-slate-50/50">
-                <CardTitle className="text-xl text-primary font-bold">Ficha de la Venta</CardTitle>
+                <CardTitle className="text-xl text-primary font-bold flex items-center gap-2">
+                  Ficha de la Venta
+                  {selectedVenta.es_muestra && (
+                    <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-800">MUESTRA · sin cargo</Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>Resumen general y datos de facturación.</CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">
