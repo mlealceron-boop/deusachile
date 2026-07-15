@@ -219,6 +219,7 @@ function VentasPage() {
       cliente_id: filteredClients[0]?.id || "",
       ejecutivo_id: isAdmin ? (ejecutivos[0]?.id || "") : (user?.id || ""),
       fecha: new Date().toISOString().split("T")[0],
+      es_muestra: false,
     });
     setFormItems([]);
     setView("create");
