@@ -385,7 +385,7 @@ function VentasPage() {
       const { error: rpcErr } = await supabase.rpc("recalcular_venta", { p_venta_id: ventaId });
       if (rpcErr) throw rpcErr;
 
-      toast.success("Venta registrada correctamente");
+      toast.success(esMuestra ? "Muestra registrada · stock descontado sin cargo" : "Venta registrada correctamente");
       setView("list");
       cargarDatos();
     } catch (err: any) {
