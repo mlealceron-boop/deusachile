@@ -65,6 +65,9 @@ export const CLIENTES_HEADERS = [
   "region",
   "ciudad",
   "comuna",
+  "nivel",
+  "interes",
+  "notas",
   "ejecutivo_email",
 ];
 
