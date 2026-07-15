@@ -157,8 +157,10 @@ function ClientesPage() {
     estado: "prospecto" as EstadoCliente,
     region: "",
     ciudad: "",
+    comuna: "",
     ejecutivo_id: "",
   });
+
 
 
   async function cargar() {
