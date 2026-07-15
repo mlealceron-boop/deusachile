@@ -251,6 +251,24 @@ function ClienteDetalle() {
               <span className="text-muted-foreground">Interacciones:</span>
               <span className="font-semibold text-slate-700">{interacciones.length}</span>
             </div>
+            {cliente.nivel && (
+              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span className="text-muted-foreground">Nivel:</span>
+                <span className="font-semibold text-slate-700">{cliente.nivel}</span>
+              </div>
+            )}
+            {cliente.interes && (
+              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                <span className="text-muted-foreground">Interés:</span>
+                <span className="font-semibold text-slate-700">{cliente.interes}</span>
+              </div>
+            )}
+            {cliente.notas && (
+              <div className="pt-2">
+                <span className="text-muted-foreground block mb-1">Notas:</span>
+                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{cliente.notas}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
