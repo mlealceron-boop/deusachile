@@ -157,7 +157,7 @@ export async function importarClientes(
 
   const { error, count } = await supabase
     .from("clientes")
-    .insert(payload, { count: "exact" });
+    .insert(payload as never, { count: "exact" });
   if (error) {
     errors.push({ row: 0, message: error.message });
     return { inserted: 0, errors };
