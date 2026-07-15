@@ -40,6 +40,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { formatCLP, parseProductoNombre, obtenerPrecioPorVolumen } from "@/lib/products";
+import { BulkUploadDialog } from "@/components/BulkUploadDialog";
+import { descargarPlantillaVentas, importarVentas } from "@/lib/bulk-upload";
 
 export const Route = createFileRoute("/_authenticated/ventas")({
   component: VentasPage,
