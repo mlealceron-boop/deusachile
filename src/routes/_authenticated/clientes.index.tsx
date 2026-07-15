@@ -33,6 +33,8 @@ import {
 } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { BulkUploadDialog } from "@/components/BulkUploadDialog";
+import { descargarPlantillaClientes, importarClientes } from "@/lib/bulk-upload";
 
 export const Route = createFileRoute("/_authenticated/clientes/")({
   component: ClientesPage,
