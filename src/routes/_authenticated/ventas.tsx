@@ -564,7 +564,12 @@ function VentasPage() {
                           {new Date(v.fecha).toLocaleDateString("es-ES")}
                         </TableCell>
                         <TableCell>
-                          <div className="font-semibold text-slate-800">{v.clientes?.nombre}</div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-slate-800">{v.clientes?.nombre}</span>
+                            {v.es_muestra && (
+                              <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-800 text-[10px]">MUESTRA</Badge>
+                            )}
+                          </div>
                           {v.clientes?.clinica && <div className="text-xs text-muted-foreground">{v.clientes.clinica}</div>}
                         </TableCell>
                         {isAdmin && <TableCell className="text-slate-600 font-medium">{v.usuarios?.nombre ?? "—"}</TableCell>}
