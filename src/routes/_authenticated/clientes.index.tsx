@@ -441,8 +441,10 @@ function ClientesPage() {
               </DialogFooter>
             </form>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
+
 
       {/* Filters card */}
       <Card className="border border-border">
