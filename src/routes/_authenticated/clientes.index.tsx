@@ -123,6 +123,7 @@ function ClientesPage() {
     tipo: "recien_empieza" as TipoCliente,
     estado: "prospecto" as EstadoCliente,
     region: "",
+    ciudad: "",
     ejecutivo_id: "",
   });
 
