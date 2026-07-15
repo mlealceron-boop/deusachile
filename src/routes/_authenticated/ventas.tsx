@@ -128,7 +128,7 @@ function VentasPage() {
       // 1. Fetch sales
       const { data: vData, error: vErr } = await supabase
         .from("ventas")
-        .select("*, clientes:cliente_id(nombre, clinica), usuarios:ejecutivo_id(nombre), venta_items(id)")
+        .select("*, clientes:cliente_id(nombre, clinica), usuarios!ventas_ejecutivo_id_fkey(nombre), venta_items(id)")
         .order("fecha", { ascending: false });
       if (vErr) throw vErr;
       setVentas((vData as any) ?? []);
