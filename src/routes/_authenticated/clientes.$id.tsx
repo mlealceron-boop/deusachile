@@ -204,6 +204,18 @@ function ClienteDetalle() {
                   </Select>
                 </div>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="nivel">Nivel</Label>
+                <Input id="nivel" value={cliente.nivel ?? ""} onChange={(e) => setCliente({ ...cliente, nivel: e.target.value })} placeholder="Ej. Alto, Medio, Bajo" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interes">Interés</Label>
+                <Input id="interes" value={cliente.interes ?? ""} onChange={(e) => setCliente({ ...cliente, interes: e.target.value })} placeholder="Ej. Compra inmediata, Futuro" />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea id="notas" value={cliente.notas ?? ""} onChange={(e) => setCliente({ ...cliente, notas: e.target.value })} placeholder="Observaciones generales del cliente..." rows={3} />
+              </div>
             </div>
             <div className="flex justify-end pt-2">
               <Button onClick={guardar} disabled={saving} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
