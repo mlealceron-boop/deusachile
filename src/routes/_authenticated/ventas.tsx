@@ -684,19 +684,19 @@ function VentasPage() {
               <CardContent className="pt-6 space-y-3 text-sm">
                 <div className="flex justify-between pb-2 border-b border-slate-100">
                   <span className="text-muted-foreground">Subtotal Neto:</span>
-                  <span className="font-semibold text-slate-800">{formatCLP(totalNeto)}</span>
+                  <span className="font-semibold text-slate-800">{formatCLP(formCabecera.es_muestra ? 0 : totalNeto)}</span>
                 </div>
                 <div className="flex justify-between pb-2 border-b border-slate-100">
                   <span className="text-muted-foreground">IVA (19%):</span>
-                  <span className="font-semibold text-slate-800">{formatCLP(totalBruto - totalNeto)}</span>
+                  <span className="font-semibold text-slate-800">{formatCLP(formCabecera.es_muestra ? 0 : totalBruto - totalNeto)}</span>
                 </div>
                 <div className="flex justify-between pb-2 border-b border-slate-100 bg-slate-50 p-2 rounded">
                   <span className="text-primary font-bold">Total Bruto:</span>
-                  <span className="font-bold text-primary text-base">{formatCLP(totalBruto)}</span>
+                  <span className="font-bold text-primary text-base">{formatCLP(formCabecera.es_muestra ? 0 : totalBruto)}</span>
                 </div>
                 <div className="flex justify-between pt-2">
-                  <span className="text-secondary font-semibold">Comisión Sugerida ({porcentajeComisionVigente}%):</span>
-                  <span className="font-bold text-secondary">{formatCLP(totalComision)}</span>
+                  <span className="text-secondary font-semibold">Comisión Sugerida ({formCabecera.es_muestra ? 0 : porcentajeComisionVigente}%):</span>
+                  <span className="font-bold text-secondary">{formatCLP(formCabecera.es_muestra ? 0 : totalComision)}</span>
                 </div>
               </CardContent>
             </Card>
