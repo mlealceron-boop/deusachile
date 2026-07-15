@@ -164,6 +164,7 @@ function DashboardPage() {
       let salesQuery = supabase
         .from("ventas")
         .select("id, fecha, total_neto, total_bruto, total_comision, ejecutivo_id, clientes:cliente_id(nombre), usuarios:ejecutivo_id(nombre)")
+        .eq("es_muestra", false)
         .gte("fecha", from.toISOString())
         .lte("fecha", to.toISOString());
 

@@ -56,6 +56,7 @@ interface Venta {
   total_bruto: number;
   total_comision: number;
   porcentaje_comision: number;
+  es_muestra?: boolean;
   creado_por: string | null;
   creado_en: string;
   clientes?: { nombre: string; clinica: string | null } | null;
@@ -120,6 +121,7 @@ function VentasPage() {
     cliente_id: "",
     ejecutivo_id: "",
     fecha: new Date().toISOString().split("T")[0],
+    es_muestra: false,
   });
   const [formItems, setFormItems] = useState<VentaItem[]>([]);
   const [guardando, setGuardando] = useState(false);
@@ -217,6 +219,7 @@ function VentasPage() {
       cliente_id: filteredClients[0]?.id || "",
       ejecutivo_id: isAdmin ? (ejecutivos[0]?.id || "") : (user?.id || ""),
       fecha: new Date().toISOString().split("T")[0],
+      es_muestra: false,
     });
     setFormItems([]);
     setView("create");
@@ -317,6 +320,22 @@ function VentasPage() {
 
     setGuardando(true);
     try {
+      const esMuestra = formCabecera.es_muestra;
+      // Si es muestra: forzar precios y comisiones a 0
+      const itemsAjustados = formItems.map((it) => {
+        if (!esMuestra) return it;
+        return {
+          ...it,
+          precio_neto_unit: 0,
+          subtotal_neto: 0,
+          subtotal_bruto: 0,
+          comision_item: 0,
+        };
+      });
+      const totalNetoFinal = esMuestra ? 0 : totalNeto;
+      const totalBrutoFinal = esMuestra ? 0 : totalBruto;
+      const totalComisionFinal = esMuestra ? 0 : totalComision;
+
       // 1. Insert header
       const { data: ventaData, error: ventaErr } = await supabase
         .from("ventas")
@@ -324,10 +343,11 @@ function VentasPage() {
           cliente_id: formCabecera.cliente_id,
           ejecutivo_id: formCabecera.ejecutivo_id || user?.id || "",
           fecha: new Date(formCabecera.fecha).toISOString(),
-          porcentaje_comision: porcentajeComisionVigente,
-          total_neto: totalNeto,
-          total_bruto: totalBruto,
-          total_comision: totalComision,
+          porcentaje_comision: esMuestra ? 0 : porcentajeComisionVigente,
+          total_neto: totalNetoFinal,
+          total_bruto: totalBrutoFinal,
+          total_comision: totalComisionFinal,
+          es_muestra: esMuestra,
           creado_por: user?.id || null,
         })
         .select("id")
@@ -337,7 +357,7 @@ function VentasPage() {
       const ventaId = ventaData.id;
 
       // 2. Insert items
-      const itemsPayload = formItems.map((item) => ({
+      const itemsPayload = itemsAjustados.map((item) => ({
         venta_id: ventaId,
         producto_id: item.producto_id,
         cantidad: item.cantidad,
@@ -365,7 +385,7 @@ function VentasPage() {
       const { error: rpcErr } = await supabase.rpc("recalcular_venta", { p_venta_id: ventaId });
       if (rpcErr) throw rpcErr;
 
-      toast.success("Venta registrada correctamente");
+      toast.success(esMuestra ? "Muestra registrada · stock descontado sin cargo" : "Venta registrada correctamente");
       setView("list");
       cargarDatos();
     } catch (err: any) {
@@ -544,7 +564,12 @@ function VentasPage() {
                           {new Date(v.fecha).toLocaleDateString("es-ES")}
                         </TableCell>
                         <TableCell>
-                          <div className="font-semibold text-slate-800">{v.clientes?.nombre}</div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-semibold text-slate-800">{v.clientes?.nombre}</span>
+                            {v.es_muestra && (
+                              <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-800 text-[10px]">MUESTRA</Badge>
+                            )}
+                          </div>
                           {v.clientes?.clinica && <div className="text-xs text-muted-foreground">{v.clientes.clinica}</div>}
                         </TableCell>
                         {isAdmin && <TableCell className="text-slate-600 font-medium">{v.usuarios?.nombre ?? "—"}</TableCell>}
@@ -632,6 +657,24 @@ function VentasPage() {
                       onChange={(e) => setFormCabecera({ ...formCabecera, fecha: e.target.value })}
                     />
                   </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 cursor-pointer hover:bg-amber-100/70 transition">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-amber-600"
+                        checked={formCabecera.es_muestra}
+                        onChange={(e) => setFormCabecera({ ...formCabecera, es_muestra: e.target.checked })}
+                      />
+                      <div className="text-sm">
+                        <div className="font-semibold text-amber-900">Marcar como Muestra (sin cargo)</div>
+                        <div className="text-xs text-amber-800">
+                          Se descuenta el stock del inventario pero la venta queda con valor $0 y sin comisión.
+                          No se contabiliza en reportes de ventas ni comisiones.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -639,24 +682,26 @@ function VentasPage() {
             {/* Quick Metrics Card */}
             <Card className="border border-border shadow-sm">
               <CardHeader className="bg-slate-50/50">
-                <CardTitle className="text-base text-primary font-semibold">Cálculo de Totales</CardTitle>
+                <CardTitle className="text-base text-primary font-semibold">
+                  {formCabecera.es_muestra ? "Muestra sin cargo" : "Cálculo de Totales"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-3 text-sm">
                 <div className="flex justify-between pb-2 border-b border-slate-100">
                   <span className="text-muted-foreground">Subtotal Neto:</span>
-                  <span className="font-semibold text-slate-800">{formatCLP(totalNeto)}</span>
+                  <span className="font-semibold text-slate-800">{formatCLP(formCabecera.es_muestra ? 0 : totalNeto)}</span>
                 </div>
                 <div className="flex justify-between pb-2 border-b border-slate-100">
                   <span className="text-muted-foreground">IVA (19%):</span>
-                  <span className="font-semibold text-slate-800">{formatCLP(totalBruto - totalNeto)}</span>
+                  <span className="font-semibold text-slate-800">{formatCLP(formCabecera.es_muestra ? 0 : totalBruto - totalNeto)}</span>
                 </div>
                 <div className="flex justify-between pb-2 border-b border-slate-100 bg-slate-50 p-2 rounded">
                   <span className="text-primary font-bold">Total Bruto:</span>
-                  <span className="font-bold text-primary text-base">{formatCLP(totalBruto)}</span>
+                  <span className="font-bold text-primary text-base">{formatCLP(formCabecera.es_muestra ? 0 : totalBruto)}</span>
                 </div>
                 <div className="flex justify-between pt-2">
-                  <span className="text-secondary font-semibold">Comisión Sugerida ({porcentajeComisionVigente}%):</span>
-                  <span className="font-bold text-secondary">{formatCLP(totalComision)}</span>
+                  <span className="text-secondary font-semibold">Comisión Sugerida ({formCabecera.es_muestra ? 0 : porcentajeComisionVigente}%):</span>
+                  <span className="font-bold text-secondary">{formatCLP(formCabecera.es_muestra ? 0 : totalComision)}</span>
                 </div>
               </CardContent>
             </Card>
@@ -815,7 +860,12 @@ function VentasPage() {
             {/* Header breakdown */}
             <Card className="md:col-span-2 border border-border shadow-sm">
               <CardHeader className="bg-slate-50/50">
-                <CardTitle className="text-xl text-primary font-bold">Ficha de la Venta</CardTitle>
+                <CardTitle className="text-xl text-primary font-bold flex items-center gap-2">
+                  Ficha de la Venta
+                  {selectedVenta.es_muestra && (
+                    <Badge variant="outline" className="border-amber-400 bg-amber-50 text-amber-800">MUESTRA · sin cargo</Badge>
+                  )}
+                </CardTitle>
                 <CardDescription>Resumen general y datos de facturación.</CardDescription>
               </CardHeader>
               <CardContent className="pt-6 space-y-4">

@@ -111,6 +111,7 @@ function RankingPage() {
       const { data: salesData, error: sErr } = await supabase
         .from("ventas")
         .select("total_neto, total_comision, ejecutivo_id")
+        .eq("es_muestra", false)
         .gte("fecha", from.toISOString())
         .lte("fecha", to.toISOString());
       

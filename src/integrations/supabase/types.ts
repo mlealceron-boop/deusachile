@@ -612,6 +612,7 @@ export type Database = {
           creado_en: string
           creado_por: string | null
           ejecutivo_id: string
+          es_muestra: boolean
           fecha: string
           id: string
           porcentaje_comision: number
@@ -624,6 +625,7 @@ export type Database = {
           creado_en?: string
           creado_por?: string | null
           ejecutivo_id: string
+          es_muestra?: boolean
           fecha?: string
           id?: string
           porcentaje_comision?: number
@@ -636,6 +638,7 @@ export type Database = {
           creado_en?: string
           creado_por?: string | null
           ejecutivo_id?: string
+          es_muestra?: boolean
           fecha?: string
           id?: string
           porcentaje_comision?: number
