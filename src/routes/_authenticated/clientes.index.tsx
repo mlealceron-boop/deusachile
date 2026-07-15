@@ -103,6 +103,7 @@ function ClientesPage() {
     contacto: "",
     tipo: "recien_empieza" as TipoCliente,
     estado: "prospecto" as EstadoCliente,
+    region: "",
     ejecutivo_id: "",
   });
 
