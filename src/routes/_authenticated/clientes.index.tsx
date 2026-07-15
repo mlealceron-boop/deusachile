@@ -149,6 +149,7 @@ function ClientesPage() {
       contacto: form.contacto || null,
       tipo: form.tipo,
       estado: form.estado,
+      region: form.region || null,
       ejecutivo_id,
     });
     if (error) {
@@ -163,6 +164,7 @@ function ClientesPage() {
       contacto: "",
       tipo: "recien_empieza",
       estado: "prospecto",
+      region: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
     cargar();
