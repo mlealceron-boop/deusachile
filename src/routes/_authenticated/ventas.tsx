@@ -121,6 +121,7 @@ function VentasPage() {
     cliente_id: "",
     ejecutivo_id: "",
     fecha: new Date().toISOString().split("T")[0],
+    es_muestra: false,
   });
   const [formItems, setFormItems] = useState<VentaItem[]>([]);
   const [guardando, setGuardando] = useState(false);
