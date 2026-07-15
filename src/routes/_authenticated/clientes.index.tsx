@@ -170,8 +170,13 @@ function ClientesPage() {
     }
     const { error } = await supabase.from("clientes").insert({
       nombre: form.nombre,
+      rut: form.rut || null,
       clinica: form.clinica || null,
-      contacto: form.contacto || null,
+      contacto: form.telefono || form.email || null,
+      telefono: form.telefono || null,
+      email: form.email || null,
+      direccion: form.direccion || null,
+      rss: form.rss || null,
       tipo: form.tipo,
       estado: form.estado,
       region: form.region || null,
@@ -186,14 +191,19 @@ function ClientesPage() {
     setOpen(false);
     setForm({
       nombre: "",
+      rut: "",
       clinica: "",
-      contacto: "",
+      telefono: "",
+      email: "",
+      direccion: "",
+      rss: "",
       tipo: "recien_empieza",
       estado: "prospecto",
       region: "",
       ciudad: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
+
     cargar();
   }
 
