@@ -99,6 +99,9 @@ function ClienteDetalle() {
       contacto: cliente.contacto,
       tipo: cliente.tipo,
       estado: cliente.estado,
+      nivel: cliente.nivel,
+      interes: cliente.interes,
+      notas: cliente.notas,
     };
     if (isAdmin) {
       updates.ejecutivo_id = cliente.ejecutivo_id;
