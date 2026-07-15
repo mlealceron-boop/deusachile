@@ -320,6 +320,22 @@ function VentasPage() {
 
     setGuardando(true);
     try {
+      const esMuestra = formCabecera.es_muestra;
+      // Si es muestra: forzar precios y comisiones a 0
+      const itemsAjustados = formItems.map((it) => {
+        if (!esMuestra) return it;
+        return {
+          ...it,
+          precio_neto_unit: 0,
+          subtotal_neto: 0,
+          subtotal_bruto: 0,
+          comision_item: 0,
+        };
+      });
+      const totalNetoFinal = esMuestra ? 0 : totalNeto;
+      const totalBrutoFinal = esMuestra ? 0 : totalBruto;
+      const totalComisionFinal = esMuestra ? 0 : totalComision;
+
       // 1. Insert header
       const { data: ventaData, error: ventaErr } = await supabase
         .from("ventas")
@@ -327,10 +343,11 @@ function VentasPage() {
           cliente_id: formCabecera.cliente_id,
           ejecutivo_id: formCabecera.ejecutivo_id || user?.id || "",
           fecha: new Date(formCabecera.fecha).toISOString(),
-          porcentaje_comision: porcentajeComisionVigente,
-          total_neto: totalNeto,
-          total_bruto: totalBruto,
-          total_comision: totalComision,
+          porcentaje_comision: esMuestra ? 0 : porcentajeComisionVigente,
+          total_neto: totalNetoFinal,
+          total_bruto: totalBrutoFinal,
+          total_comision: totalComisionFinal,
+          es_muestra: esMuestra,
           creado_por: user?.id || null,
         })
         .select("id")
@@ -340,7 +357,7 @@ function VentasPage() {
       const ventaId = ventaData.id;
 
       // 2. Insert items
-      const itemsPayload = formItems.map((item) => ({
+      const itemsPayload = itemsAjustados.map((item) => ({
         venta_id: ventaId,
         producto_id: item.producto_id,
         cantidad: item.cantidad,
