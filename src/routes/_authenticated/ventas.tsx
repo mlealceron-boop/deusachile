@@ -56,6 +56,7 @@ interface Venta {
   total_bruto: number;
   total_comision: number;
   porcentaje_comision: number;
+  es_muestra?: boolean;
   creado_por: string | null;
   creado_en: string;
   clientes?: { nombre: string; clinica: string | null } | null;
