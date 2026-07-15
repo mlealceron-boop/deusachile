@@ -652,6 +652,24 @@ function VentasPage() {
                       onChange={(e) => setFormCabecera({ ...formCabecera, fecha: e.target.value })}
                     />
                   </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 cursor-pointer hover:bg-amber-100/70 transition">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 accent-amber-600"
+                        checked={formCabecera.es_muestra}
+                        onChange={(e) => setFormCabecera({ ...formCabecera, es_muestra: e.target.checked })}
+                      />
+                      <div className="text-sm">
+                        <div className="font-semibold text-amber-900">Marcar como Muestra (sin cargo)</div>
+                        <div className="text-xs text-amber-800">
+                          Se descuenta el stock del inventario pero la venta queda con valor $0 y sin comisión.
+                          No se contabiliza en reportes de ventas ni comisiones.
+                        </div>
+                      </div>
+                    </label>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -659,7 +677,9 @@ function VentasPage() {
             {/* Quick Metrics Card */}
             <Card className="border border-border shadow-sm">
               <CardHeader className="bg-slate-50/50">
-                <CardTitle className="text-base text-primary font-semibold">Cálculo de Totales</CardTitle>
+                <CardTitle className="text-base text-primary font-semibold">
+                  {formCabecera.es_muestra ? "Muestra sin cargo" : "Cálculo de Totales"}
+                </CardTitle>
               </CardHeader>
               <CardContent className="pt-6 space-y-3 text-sm">
                 <div className="flex justify-between pb-2 border-b border-slate-100">
