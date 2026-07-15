@@ -61,6 +61,7 @@ export type Database = {
           estado: Database["public"]["Enums"]["estado_cliente"]
           id: string
           nombre: string
+          region: string | null
           tipo: Database["public"]["Enums"]["tipo_cliente"]
         }
         Insert: {
@@ -71,6 +72,7 @@ export type Database = {
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
           nombre: string
+          region?: string | null
           tipo?: Database["public"]["Enums"]["tipo_cliente"]
         }
         Update: {
@@ -81,6 +83,7 @@ export type Database = {
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
           nombre?: string
+          region?: string | null
           tipo?: Database["public"]["Enums"]["tipo_cliente"]
         }
         Relationships: [
