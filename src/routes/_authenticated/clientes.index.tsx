@@ -212,6 +212,7 @@ function ClientesPage() {
       estado: form.estado,
       region: form.region || null,
       ciudad: form.ciudad || null,
+      comuna: form.comuna || form.ciudad || null,
       ejecutivo_id,
     });
     if (error) {
@@ -232,8 +233,10 @@ function ClientesPage() {
       estado: "prospecto",
       region: "",
       ciudad: "",
+      comuna: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
+
 
     cargar();
   }
