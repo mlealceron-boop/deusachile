@@ -98,7 +98,7 @@ function AuthPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast.success("Administrador creado");
-      router.navigate({ to: "/dashboard", replace: true });
+      goPostAuth();
     } catch (err: any) {
       toast.error(err?.message ?? "No se pudo crear el administrador");
     } finally {
