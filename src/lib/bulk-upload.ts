@@ -24,7 +24,19 @@ export function downloadTemplate(opts: {
     insWs["!cols"] = [{ wch: 100 }];
     XLSX.utils.book_append_sheet(wb, insWs, "Instrucciones");
   }
-  XLSX.writeFile(wb, opts.filename);
+  // Use write + Blob for reliable browser download (avoids XLSX.writeFile issues in some bundles)
+  const wbout = XLSX.write(wb, { bookType: "xlsx", type: "array" }) as ArrayBuffer;
+  const blob = new Blob([wbout], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = opts.filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 // ---------------- Excel → rows ----------------
