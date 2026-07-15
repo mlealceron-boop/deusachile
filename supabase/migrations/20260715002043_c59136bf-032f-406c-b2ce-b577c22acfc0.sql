@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.any_admin_exists() TO anon, authenticated;
