@@ -395,11 +395,11 @@ function VentasPage() {
   }
 
   async function anularVenta(ventaId: string) {
-    if (!confirm("¿Estás seguro de que deseas anular esta venta? Esto la eliminará del historial de forma permanente.")) return;
+    if (!confirm("¿Estás seguro de que deseas anular esta venta? Se devolverá el stock al inventario y se eliminará del historial.")) return;
     try {
-      const { error } = await supabase.from("ventas").delete().eq("id", ventaId);
+      const { error } = await supabase.rpc("anular_venta", { p_venta_id: ventaId });
       if (error) throw error;
-      toast.success("Venta anulada correctamente");
+      toast.success("Venta anulada y stock devuelto al inventario");
       setView("list");
       cargarDatos();
     } catch (err: any) {

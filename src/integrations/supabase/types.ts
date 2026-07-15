@@ -672,6 +672,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      anular_venta: { Args: { p_venta_id: string }; Returns: undefined }
       any_admin_exists: { Args: never; Returns: boolean }
       bootstrap_admin: {
         Args: { p_email: string; p_nombre: string }
