@@ -40,6 +40,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { formatCLP, parseProductoNombre, obtenerPrecioPorVolumen } from "@/lib/products";
+import { BulkUploadDialog } from "@/components/BulkUploadDialog";
+import { descargarPlantillaVentas, importarVentas } from "@/lib/bulk-upload";
 
 export const Route = createFileRoute("/_authenticated/ventas")({
   component: VentasPage,
@@ -427,9 +429,21 @@ function VentasPage() {
                 {isAdmin ? "Historial global de facturación y comisiones." : "Tu historial de ventas y comisiones registradas."}
               </p>
             </div>
-            <Button onClick={abrirCrearVenta} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md transition-all hover:scale-[1.01]">
-              <Plus className="mr-2 h-4 w-4" /> Registrar Venta
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              {isAdmin && user && (
+                <BulkUploadDialog
+                  title="Carga masiva de ventas"
+                  description="Importa varias ventas desde un archivo Excel. Cada fila es un ítem; agrupa ítems de la misma venta con el mismo 'venta_ref'."
+                  onDownloadTemplate={descargarPlantillaVentas}
+                  onImport={(file) => importarVentas(file, user.id)}
+                  onDone={cargarDatos}
+                />
+              )}
+              <Button onClick={abrirCrearVenta} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md transition-all hover:scale-[1.01]">
+                <Plus className="mr-2 h-4 w-4" /> Registrar Venta
+              </Button>
+            </div>
+
           </div>
 
           {/* Filters Card */}
