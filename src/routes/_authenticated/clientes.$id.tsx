@@ -228,6 +228,38 @@ function ClienteDetalle() {
                 <Label htmlFor="interes">Interés</Label>
                 <Input id="interes" value={cliente.interes ?? ""} onChange={(e) => setCliente({ ...cliente, interes: e.target.value })} placeholder="Ej. Compra inmediata, Futuro" />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="rut">RUT</Label>
+                <Input id="rut" value={cliente.rut ?? ""} onChange={(e) => setCliente({ ...cliente, rut: e.target.value })} placeholder="12.345.678-9" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={cliente.email ?? ""} onChange={(e) => setCliente({ ...cliente, email: e.target.value })} placeholder="cliente@correo.cl" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input id="telefono" value={cliente.telefono ?? ""} onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })} placeholder="+56 9 ..." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rss">Redes Sociales</Label>
+                <Input id="rss" value={cliente.rss ?? ""} onChange={(e) => setCliente({ ...cliente, rss: e.target.value })} placeholder="@usuario / IG / LinkedIn" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="region">Región</Label>
+                <Input id="region" value={cliente.region ?? ""} onChange={(e) => setCliente({ ...cliente, region: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ciudad">Ciudad</Label>
+                <Input id="ciudad" value={cliente.ciudad ?? ""} onChange={(e) => setCliente({ ...cliente, ciudad: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="comuna">Comuna</Label>
+                <Input id="comuna" value={cliente.comuna ?? ""} onChange={(e) => setCliente({ ...cliente, comuna: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="direccion">Dirección</Label>
+                <Input id="direccion" value={cliente.direccion ?? ""} onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })} />
+              </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="notas">Notas</Label>
                 <Textarea id="notas" value={cliente.notas ?? ""} onChange={(e) => setCliente({ ...cliente, notas: e.target.value })} placeholder="Observaciones generales del cliente..." rows={3} />
