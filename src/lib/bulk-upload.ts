@@ -65,6 +65,9 @@ export const CLIENTES_HEADERS = [
   "region",
   "ciudad",
   "comuna",
+  "nivel",
+  "interes",
+  "notas",
   "ejecutivo_email",
 ];
 
@@ -87,6 +90,9 @@ export function descargarPlantillaClientes() {
         "Metropolitana de Santiago",
         "Santiago",
         "Providencia",
+        "A",
+        "Láser, Toxina",
+        "Cliente referido por Dra. Soto",
         "ejecutivo@empresa.cl",
       ],
     ],
@@ -161,6 +167,9 @@ export async function importarClientes(
       region: norm(r.region) || null,
       ciudad: norm(r.ciudad) || null,
       comuna: norm(r.comuna) || null,
+      nivel: norm(r.nivel) || null,
+      interes: norm(r.interes) || null,
+      notas: norm(r.notas) || null,
       ejecutivo_id,
     });
   });

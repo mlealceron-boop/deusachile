@@ -64,7 +64,10 @@ export type Database = {
           email: string | null
           estado: Database["public"]["Enums"]["estado_cliente"]
           id: string
+          interes: string | null
+          nivel: string | null
           nombre: string
+          notas: string | null
           region: string | null
           rss: string | null
           rut: string | null
@@ -82,7 +85,10 @@ export type Database = {
           email?: string | null
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
+          interes?: string | null
+          nivel?: string | null
           nombre: string
+          notas?: string | null
           region?: string | null
           rss?: string | null
           rut?: string | null
@@ -100,7 +106,10 @@ export type Database = {
           email?: string | null
           estado?: Database["public"]["Enums"]["estado_cliente"]
           id?: string
+          interes?: string | null
+          nivel?: string | null
           nombre?: string
+          notas?: string | null
           region?: string | null
           rss?: string | null
           rut?: string | null

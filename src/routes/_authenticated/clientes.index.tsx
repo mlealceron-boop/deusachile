@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -186,6 +187,9 @@ function ClientesPage() {
     region: "",
     ciudad: "",
     comuna: "",
+    nivel: "",
+    interes: "",
+    notas: "",
     ejecutivo_id: "",
   });
 
@@ -241,6 +245,9 @@ function ClientesPage() {
       region: form.region || null,
       ciudad: form.ciudad || null,
       comuna: form.comuna || form.ciudad || null,
+      nivel: form.nivel || null,
+      interes: form.interes || null,
+      notas: form.notas || null,
       ejecutivo_id,
     });
     if (error) {
@@ -262,6 +269,9 @@ function ClientesPage() {
       region: "",
       ciudad: "",
       comuna: "",
+      nivel: "",
+      interes: "",
+      notas: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
 
@@ -424,6 +434,22 @@ function ClientesPage() {
                   </Select>
                 </div>
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nivel">Nivel</Label>
+                  <Input id="nivel" value={form.nivel} onChange={(e) => setForm({ ...form, nivel: e.target.value })} placeholder="Ej: A / B / C, Alto, Medio…" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="interes">Interés</Label>
+                  <Input id="interes" value={form.interes} onChange={(e) => setForm({ ...form, interes: e.target.value })} placeholder="Ej: Láser, Toxina, Rellenos…" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea id="notas" value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} placeholder="Observaciones, contexto, próximos pasos…" rows={3} />
+              </div>
+
 
               {isAdmin && (
                 <div className="space-y-2">
