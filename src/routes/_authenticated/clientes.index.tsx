@@ -62,6 +62,25 @@ const TIPO_LABEL: Record<TipoCliente, string> = {
   recien_empieza: "Recién empieza",
 };
 
+const REGIONES_CHILE = [
+  "Arica y Parinacota",
+  "Tarapacá",
+  "Antofagasta",
+  "Atacama",
+  "Coquimbo",
+  "Valparaíso",
+  "Metropolitana de Santiago",
+  "Libertador General Bernardo O'Higgins",
+  "Maule",
+  "Ñuble",
+  "Biobío",
+  "La Araucanía",
+  "Los Ríos",
+  "Los Lagos",
+  "Aysén del General Carlos Ibáñez del Campo",
+  "Magallanes y de la Antártica Chilena",
+];
+
 function ClientesPage() {
   const { user } = useCurrentUser();
   const isAdmin = user?.rol === "admin";
@@ -84,6 +103,7 @@ function ClientesPage() {
     contacto: "",
     tipo: "recien_empieza" as TipoCliente,
     estado: "prospecto" as EstadoCliente,
+    region: "",
     ejecutivo_id: "",
   });
 
@@ -129,6 +149,7 @@ function ClientesPage() {
       contacto: form.contacto || null,
       tipo: form.tipo,
       estado: form.estado,
+      region: form.region || null,
       ejecutivo_id,
     });
     if (error) {
@@ -143,6 +164,7 @@ function ClientesPage() {
       contacto: "",
       tipo: "recien_empieza",
       estado: "prospecto",
+      region: "",
       ejecutivo_id: isAdmin ? "" : user.id,
     });
     cargar();
@@ -215,6 +237,17 @@ function ClientesPage() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="region">Región</Label>
+                <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecciona una región" /></SelectTrigger>
+                  <SelectContent>
+                    {REGIONES_CHILE.map((r) => (
+                      <SelectItem key={r} value={r}>{r}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               {isAdmin && (
                 <div className="space-y-2">
