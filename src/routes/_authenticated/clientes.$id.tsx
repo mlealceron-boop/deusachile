@@ -36,6 +36,14 @@ interface Cliente {
   nivel: string | null;
   interes: string | null;
   notas: string | null;
+  rut: string | null;
+  email: string | null;
+  telefono: string | null;
+  region: string | null;
+  ciudad: string | null;
+  comuna: string | null;
+  direccion: string | null;
+  rss: string | null;
 }
 
 interface Interaccion {
@@ -102,6 +110,14 @@ function ClienteDetalle() {
       nivel: cliente.nivel,
       interes: cliente.interes,
       notas: cliente.notas,
+      rut: cliente.rut,
+      email: cliente.email,
+      telefono: cliente.telefono,
+      region: cliente.region,
+      ciudad: cliente.ciudad,
+      comuna: cliente.comuna,
+      direccion: cliente.direccion,
+      rss: cliente.rss,
     };
     if (isAdmin) {
       updates.ejecutivo_id = cliente.ejecutivo_id;
@@ -211,6 +227,38 @@ function ClienteDetalle() {
               <div className="space-y-2">
                 <Label htmlFor="interes">Interés</Label>
                 <Input id="interes" value={cliente.interes ?? ""} onChange={(e) => setCliente({ ...cliente, interes: e.target.value })} placeholder="Ej. Compra inmediata, Futuro" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rut">RUT</Label>
+                <Input id="rut" value={cliente.rut ?? ""} onChange={(e) => setCliente({ ...cliente, rut: e.target.value })} placeholder="12.345.678-9" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={cliente.email ?? ""} onChange={(e) => setCliente({ ...cliente, email: e.target.value })} placeholder="cliente@correo.cl" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="telefono">Teléfono</Label>
+                <Input id="telefono" value={cliente.telefono ?? ""} onChange={(e) => setCliente({ ...cliente, telefono: e.target.value })} placeholder="+56 9 ..." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rss">Redes Sociales</Label>
+                <Input id="rss" value={cliente.rss ?? ""} onChange={(e) => setCliente({ ...cliente, rss: e.target.value })} placeholder="@usuario / IG / LinkedIn" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="region">Región</Label>
+                <Input id="region" value={cliente.region ?? ""} onChange={(e) => setCliente({ ...cliente, region: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ciudad">Ciudad</Label>
+                <Input id="ciudad" value={cliente.ciudad ?? ""} onChange={(e) => setCliente({ ...cliente, ciudad: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="comuna">Comuna</Label>
+                <Input id="comuna" value={cliente.comuna ?? ""} onChange={(e) => setCliente({ ...cliente, comuna: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="direccion">Dirección</Label>
+                <Input id="direccion" value={cliente.direccion ?? ""} onChange={(e) => setCliente({ ...cliente, direccion: e.target.value })} />
               </div>
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="notas">Notas</Label>
