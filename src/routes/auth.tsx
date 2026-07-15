@@ -33,6 +33,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const router = useRouter();
+  const { next } = Route.useSearch();
   const checkAdmin = useServerFn(adminExiste);
   const bootstrap = useServerFn(bootstrapAdmin);
 
@@ -47,6 +48,14 @@ function AuthPage() {
     checkAdmin().then((r) => setHayAdmin(r.existe)).catch(() => setHayAdmin(true));
   }, [checkAdmin]);
 
+  function goPostAuth() {
+    if (next) {
+      window.location.href = next;
+      return;
+    }
+    router.navigate({ to: "/dashboard", replace: true });
+  }
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -57,13 +66,16 @@ function AuthPage() {
       return;
     }
     toast.success("Sesión iniciada");
-    router.navigate({ to: "/dashboard", replace: true });
+    goPostAuth();
   }
 
   async function handleGoogleSignIn() {
     setLoading(true);
+    const redirectUri = next
+      ? `${window.location.origin}/auth?next=${encodeURIComponent(next)}`
+      : window.location.origin;
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: redirectUri,
     });
     setLoading(false);
     if (result.error) {
@@ -75,7 +87,7 @@ function AuthPage() {
       return;
     }
     toast.success("Sesión iniciada");
-    router.navigate({ to: "/dashboard", replace: true });
+    goPostAuth();
   }
 
   async function handleBootstrap(e: React.FormEvent) {
