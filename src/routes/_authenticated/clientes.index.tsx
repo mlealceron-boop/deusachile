@@ -118,14 +118,19 @@ function ClientesPage() {
   // Form state
   const [form, setForm] = useState({
     nombre: "",
+    rut: "",
     clinica: "",
-    contacto: "",
+    telefono: "",
+    email: "",
+    direccion: "",
+    rss: "",
     tipo: "recien_empieza" as TipoCliente,
     estado: "prospecto" as EstadoCliente,
     region: "",
     ciudad: "",
     ejecutivo_id: "",
   });
+
 
   async function cargar() {
     setLoading(true);
