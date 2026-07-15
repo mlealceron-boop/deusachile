@@ -244,14 +244,35 @@ function ClientesPage() {
                 <Label htmlFor="nombre">Nombre Completo / Razón Social</Label>
                 <Input id="nombre" required value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} placeholder="Ej: Dr. Juan Pérez" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="clinica">Nombre de la Clínica</Label>
-                <Input id="clinica" value={form.clinica} onChange={(e) => setForm({ ...form, clinica: e.target.value })} placeholder="Ej: Clínica de Estética Bella" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="rut">RUT</Label>
+                  <Input id="rut" value={form.rut} onChange={(e) => setForm({ ...form, rut: e.target.value })} placeholder="Ej: 12.345.678-9" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="clinica">Nombre de la Clínica</Label>
+                  <Input id="clinica" value={form.clinica} onChange={(e) => setForm({ ...form, clinica: e.target.value })} placeholder="Ej: Clínica de Estética Bella" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="telefono">Teléfono</Label>
+                  <Input id="telefono" type="tel" value={form.telefono} onChange={(e) => setForm({ ...form, telefono: e.target.value })} placeholder="Ej: +56 9 1234 5678" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="Ej: email@ejemplo.com" />
+                </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="contacto">Contacto (Teléfono o Email)</Label>
-                <Input id="contacto" value={form.contacto} onChange={(e) => setForm({ ...form, contacto: e.target.value })} placeholder="Ej: +56 9 1234 5678 o email@ejemplo.com" />
+                <Label htmlFor="direccion">Dirección</Label>
+                <Input id="direccion" value={form.direccion} onChange={(e) => setForm({ ...form, direccion: e.target.value })} placeholder="Ej: Av. Providencia 1234, Of. 501" />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="rss">Redes Sociales (RSS)</Label>
+                <Input id="rss" value={form.rss} onChange={(e) => setForm({ ...form, rss: e.target.value })} placeholder="Ej: @clinica_ig, facebook.com/clinica" />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="tipo">Tipo</Label>
