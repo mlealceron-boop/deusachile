@@ -436,7 +436,7 @@ function VentasPage() {
                   description="Importa varias ventas desde un archivo Excel. Cada fila es un ítem; agrupa ítems de la misma venta con el mismo 'venta_ref'."
                   onDownloadTemplate={descargarPlantillaVentas}
                   onImport={(file) => importarVentas(file, user.id)}
-                  onDone={cargarVentas}
+                  onDone={cargarDatos}
                 />
               )}
               <Button onClick={abrirCrearVenta} className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-md transition-all hover:scale-[1.01]">
