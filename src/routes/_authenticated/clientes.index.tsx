@@ -289,12 +289,23 @@ function ClientesPage() {
             {isAdmin ? "Todos los clientes registrados en la empresa." : "Tu cartera de clientes asignados."}
           </p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all hover:scale-[1.01]">
-              <Plus className="mr-2 h-4 w-4" /> Nuevo cliente
-            </Button>
-          </DialogTrigger>
+        <div className="flex flex-wrap items-center gap-2">
+          {isAdmin && user && (
+            <BulkUploadDialog
+              title="Carga masiva de clientes"
+              description="Importa varios clientes desde un archivo Excel. Descarga la plantilla, complétala y súbela."
+              onDownloadTemplate={descargarPlantillaClientes}
+              onImport={(file) => importarClientes(file, user.id)}
+              onDone={cargar}
+            />
+          )}
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-md transition-all hover:scale-[1.01]">
+                <Plus className="mr-2 h-4 w-4" /> Nuevo cliente
+              </Button>
+            </DialogTrigger>
+
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Nuevo cliente</DialogTitle>
