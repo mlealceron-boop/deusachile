@@ -330,10 +330,10 @@ function ClientesPage() {
                   </Select>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="region">Región</Label>
-                  <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v, ciudad: "" })}>
+                  <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v, ciudad: "", comuna: "" })}>
                     <SelectTrigger><SelectValue placeholder="Selecciona una región" /></SelectTrigger>
                     <SelectContent>
                       {REGIONES_CHILE.map((r) => (
@@ -346,11 +346,11 @@ function ClientesPage() {
                   <Label htmlFor="ciudad">Ciudad</Label>
                   <Select
                     value={form.ciudad}
-                    onValueChange={(v) => setForm({ ...form, ciudad: v })}
+                    onValueChange={(v) => setForm({ ...form, ciudad: v, comuna: "" })}
                     disabled={!form.region}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={form.region ? "Selecciona una ciudad" : "Selecciona región primero"} />
+                      <SelectValue placeholder={form.region ? "Selecciona ciudad" : "Región primero"} />
                     </SelectTrigger>
                     <SelectContent>
                       {(CIUDADES_POR_REGION[form.region] ?? []).map((c) => (
@@ -359,7 +359,33 @@ function ClientesPage() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="comuna">Comuna</Label>
+                  <Select
+                    value={form.comuna}
+                    onValueChange={(v) => setForm({ ...form, comuna: v })}
+                    disabled={!form.ciudad || !COMUNAS_POR_CIUDAD[form.ciudad]}
+                  >
+                    <SelectTrigger>
+                      <SelectValue
+                        placeholder={
+                          !form.ciudad
+                            ? "Ciudad primero"
+                            : COMUNAS_POR_CIUDAD[form.ciudad]
+                              ? "Selecciona comuna"
+                              : "No aplica"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(COMUNAS_POR_CIUDAD[form.ciudad] ?? []).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
               {isAdmin && (
                 <div className="space-y-2">
                   <Label htmlFor="ejecutivo">Ejecutivo Asignado</Label>
