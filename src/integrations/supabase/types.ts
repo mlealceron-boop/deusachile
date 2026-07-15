@@ -54,6 +54,7 @@ export type Database = {
       }
       clientes: {
         Row: {
+          ciudad: string | null
           clinica: string | null
           contacto: string | null
           creado_en: string
@@ -65,6 +66,7 @@ export type Database = {
           tipo: Database["public"]["Enums"]["tipo_cliente"]
         }
         Insert: {
+          ciudad?: string | null
           clinica?: string | null
           contacto?: string | null
           creado_en?: string
@@ -76,6 +78,7 @@ export type Database = {
           tipo?: Database["public"]["Enums"]["tipo_cliente"]
         }
         Update: {
+          ciudad?: string | null
           clinica?: string | null
           contacto?: string | null
           creado_en?: string
