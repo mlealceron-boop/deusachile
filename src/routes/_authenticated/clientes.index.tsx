@@ -435,6 +435,22 @@ function ClientesPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="nivel">Nivel</Label>
+                  <Input id="nivel" value={form.nivel} onChange={(e) => setForm({ ...form, nivel: e.target.value })} placeholder="Ej: A / B / C, Alto, Medio…" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="interes">Interés</Label>
+                  <Input id="interes" value={form.interes} onChange={(e) => setForm({ ...form, interes: e.target.value })} placeholder="Ej: Láser, Toxina, Rellenos…" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="notas">Notas</Label>
+                <Textarea id="notas" value={form.notas} onChange={(e) => setForm({ ...form, notas: e.target.value })} placeholder="Observaciones, contexto, próximos pasos…" rows={3} />
+              </div>
+
+
               {isAdmin && (
                 <div className="space-y-2">
                   <Label htmlFor="ejecutivo">Ejecutivo Asignado</Label>
