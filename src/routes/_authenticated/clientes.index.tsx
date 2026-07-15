@@ -79,7 +79,26 @@ const REGIONES_CHILE = [
   "Los Lagos",
   "Aysén del General Carlos Ibáñez del Campo",
   "Magallanes y de la Antártica Chilena",
-];
+] as const;
+
+const CIUDADES_POR_REGION: Record<string, string[]> = {
+  "Arica y Parinacota": ["Arica", "Putre", "General Lagos", "Camarones"],
+  "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Pica", "Huara", "Camiña", "Colchane"],
+  "Antofagasta": ["Antofagasta", "Calama", "Tocopilla", "Mejillones", "Taltal", "María Elena", "San Pedro de Atacama"],
+  "Atacama": ["Copiapó", "Vallenar", "Caldera", "Chañaral", "Diego de Almagro", "Huasco", "Freirina", "Tierra Amarilla"],
+  "Coquimbo": ["La Serena", "Coquimbo", "Ovalle", "Illapel", "Vicuña", "Salamanca", "Andacollo", "Monte Patria", "Los Vilos", "Combarbalá"],
+  "Valparaíso": ["Valparaíso", "Viña del Mar", "Quilpué", "Villa Alemana", "San Antonio", "Quillota", "Los Andes", "San Felipe", "La Ligua", "La Calera", "Limache", "Concón", "Cartagena", "Casablanca"],
+  "Metropolitana de Santiago": ["Santiago", "Puente Alto", "Maipú", "La Florida", "San Bernardo", "Las Condes", "Providencia", "Ñuñoa", "Peñalolén", "Vitacura", "Lo Barnechea", "La Reina", "Macul", "Quilicura", "Colina", "Melipilla", "Talagante", "Buin", "Padre Hurtado", "Peñaflor"],
+  "Libertador General Bernardo O'Higgins": ["Rancagua", "San Fernando", "Rengo", "Machalí", "Graneros", "Santa Cruz", "Pichilemu", "San Vicente", "Peumo", "Doñihue"],
+  "Maule": ["Talca", "Curicó", "Linares", "Constitución", "Cauquenes", "Molina", "San Javier", "Parral", "Longaví", "Villa Alegre"],
+  "Ñuble": ["Chillán", "Chillán Viejo", "Bulnes", "San Carlos", "Quirihue", "Coihueco", "San Nicolás", "Yungay"],
+  "Biobío": ["Concepción", "Talcahuano", "Chiguayante", "San Pedro de la Paz", "Hualpén", "Coronel", "Lota", "Los Ángeles", "Cañete", "Arauco", "Tomé", "Penco", "Lebu"],
+  "La Araucanía": ["Temuco", "Padre Las Casas", "Villarrica", "Pucón", "Angol", "Victoria", "Lautaro", "Nueva Imperial", "Carahue", "Loncoche"],
+  "Los Ríos": ["Valdivia", "La Unión", "Río Bueno", "Panguipulli", "Los Lagos", "Paillaco", "Lanco", "Máfil", "Corral", "Futrono"],
+  "Los Lagos": ["Puerto Montt", "Osorno", "Castro", "Ancud", "Puerto Varas", "Ancud", "Quellón", "Frutillar", "Llanquihue", "Purranque", "Río Negro"],
+  "Aysén del General Carlos Ibáñez del Campo": ["Coyhaique", "Puerto Aysén", "Chile Chico", "Cochrane", "Puerto Cisnes", "Villa O'Higgins"],
+  "Magallanes y de la Antártica Chilena": ["Punta Arenas", "Puerto Natales", "Porvenir", "Puerto Williams", "Cabo de Hornos"],
+};
 
 function ClientesPage() {
   const { user } = useCurrentUser();
