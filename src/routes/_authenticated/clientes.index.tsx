@@ -260,16 +260,35 @@ function ClientesPage() {
                   </Select>
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="region">Región</Label>
-                <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecciona una región" /></SelectTrigger>
-                  <SelectContent>
-                    {REGIONES_CHILE.map((r) => (
-                      <SelectItem key={r} value={r}>{r}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="region">Región</Label>
+                  <Select value={form.region} onValueChange={(v) => setForm({ ...form, region: v, ciudad: "" })}>
+                    <SelectTrigger><SelectValue placeholder="Selecciona una región" /></SelectTrigger>
+                    <SelectContent>
+                      {REGIONES_CHILE.map((r) => (
+                        <SelectItem key={r} value={r}>{r}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ciudad">Ciudad</Label>
+                  <Select
+                    value={form.ciudad}
+                    onValueChange={(v) => setForm({ ...form, ciudad: v })}
+                    disabled={!form.region}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={form.region ? "Selecciona una ciudad" : "Selecciona región primero"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(CIUDADES_POR_REGION[form.region] ?? []).map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               {isAdmin && (
                 <div className="space-y-2">
