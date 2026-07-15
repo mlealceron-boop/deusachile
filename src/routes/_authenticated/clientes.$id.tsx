@@ -110,6 +110,14 @@ function ClienteDetalle() {
       nivel: cliente.nivel,
       interes: cliente.interes,
       notas: cliente.notas,
+      rut: cliente.rut,
+      email: cliente.email,
+      telefono: cliente.telefono,
+      region: cliente.region,
+      ciudad: cliente.ciudad,
+      comuna: cliente.comuna,
+      direccion: cliente.direccion,
+      rss: cliente.rss,
     };
     if (isAdmin) {
       updates.ejecutivo_id = cliente.ejecutivo_id;
