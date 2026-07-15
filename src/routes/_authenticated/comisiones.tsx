@@ -118,6 +118,7 @@ function ComisionesPage() {
       let salesQuery = supabase
         .from("ventas")
         .select("id, fecha, total_neto, total_comision, porcentaje_comision, ejecutivo_id, clientes:cliente_id(nombre), usuarios:ejecutivo_id(nombre)")
+        .eq("es_muestra", false)
         .gte("fecha", fromStr)
         .lte("fecha", toStr)
         .order("fecha", { ascending: false });
