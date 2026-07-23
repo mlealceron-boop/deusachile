@@ -1094,6 +1094,65 @@ function VentasPage() {
           </Card>
         </div>
       )}
+
+      {/* Quick-create client dialog */}
+      <Dialog open={nuevoClienteOpen} onOpenChange={setNuevoClienteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nuevo cliente rápido</DialogTitle>
+            <DialogDescription>
+              Crea un cliente básico para asociarlo a esta venta. Podrás completar el resto de sus datos luego desde Clientes.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={crearClienteRapido} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="nc-nombre">Nombre *</Label>
+              <Input
+                id="nc-nombre"
+                required
+                autoFocus
+                value={nuevoCliente.nombre}
+                onChange={(e) => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="nc-clinica">Clínica</Label>
+              <Input
+                id="nc-clinica"
+                value={nuevoCliente.clinica}
+                onChange={(e) => setNuevoCliente({ ...nuevoCliente, clinica: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="nc-tel">Teléfono</Label>
+                <Input
+                  id="nc-tel"
+                  value={nuevoCliente.telefono}
+                  onChange={(e) => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="nc-email">Email</Label>
+                <Input
+                  id="nc-email"
+                  type="email"
+                  value={nuevoCliente.email}
+                  onChange={(e) => setNuevoCliente({ ...nuevoCliente, email: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setNuevoClienteOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={creandoCliente}>
+                {creandoCliente ? "Creando..." : "Crear y seleccionar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
