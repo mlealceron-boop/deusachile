@@ -133,6 +133,51 @@ function VentasPage() {
   const [formItems, setFormItems] = useState<VentaItem[]>([]);
   const [guardando, setGuardando] = useState(false);
 
+  // Cliente search combobox + quick-create dialog
+  const [clienteOpen, setClienteOpen] = useState(false);
+  const [nuevoClienteOpen, setNuevoClienteOpen] = useState(false);
+  const [nuevoCliente, setNuevoCliente] = useState({
+    nombre: "",
+    clinica: "",
+    telefono: "",
+    email: "",
+  });
+  const [creandoCliente, setCreandoCliente] = useState(false);
+
+  async function crearClienteRapido(e: React.FormEvent) {
+    e.preventDefault();
+    if (!nuevoCliente.nombre.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    setCreandoCliente(true);
+    try {
+      const { data, error } = await supabase
+        .from("clientes")
+        .insert({
+          nombre: nuevoCliente.nombre.trim(),
+          clinica: nuevoCliente.clinica.trim() || null,
+          telefono: nuevoCliente.telefono.trim() || null,
+          email: nuevoCliente.email.trim() || null,
+          ejecutivo_id: formCabecera.ejecutivo_id || user?.id || "",
+          estado: "prospecto",
+          tipo: "recien_empieza",
+        })
+        .select("id, nombre, clinica, ejecutivo_id")
+        .single();
+      if (error) throw error;
+      setClientes((prev) => [...prev, data as Cliente]);
+      setFormCabecera((prev) => ({ ...prev, cliente_id: data.id }));
+      toast.success("Cliente creado y seleccionado");
+      setNuevoClienteOpen(false);
+      setNuevoCliente({ nombre: "", clinica: "", telefono: "", email: "" });
+    } catch (err: any) {
+      toast.error("Error al crear cliente: " + err.message);
+    } finally {
+      setCreandoCliente(false);
+    }
+  }
+
   async function cargarDatos() {
     setLoading(true);
     try {
