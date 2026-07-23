@@ -15,7 +15,10 @@ import {
   Search,
   Filter,
   ArrowLeft,
-  X
+  X,
+  Check,
+  ChevronsUpDown,
+  UserPlus
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +40,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { formatCLP, parseProductoNombre, obtenerPrecioPorVolumen } from "@/lib/products";
@@ -125,6 +132,51 @@ function VentasPage() {
   });
   const [formItems, setFormItems] = useState<VentaItem[]>([]);
   const [guardando, setGuardando] = useState(false);
+
+  // Cliente search combobox + quick-create dialog
+  const [clienteOpen, setClienteOpen] = useState(false);
+  const [nuevoClienteOpen, setNuevoClienteOpen] = useState(false);
+  const [nuevoCliente, setNuevoCliente] = useState({
+    nombre: "",
+    clinica: "",
+    telefono: "",
+    email: "",
+  });
+  const [creandoCliente, setCreandoCliente] = useState(false);
+
+  async function crearClienteRapido(e: React.FormEvent) {
+    e.preventDefault();
+    if (!nuevoCliente.nombre.trim()) {
+      toast.error("El nombre es obligatorio");
+      return;
+    }
+    setCreandoCliente(true);
+    try {
+      const { data, error } = await supabase
+        .from("clientes")
+        .insert({
+          nombre: nuevoCliente.nombre.trim(),
+          clinica: nuevoCliente.clinica.trim() || null,
+          telefono: nuevoCliente.telefono.trim() || null,
+          email: nuevoCliente.email.trim() || null,
+          ejecutivo_id: formCabecera.ejecutivo_id || user?.id || "",
+          estado: "prospecto",
+          tipo: "recien_empieza",
+        })
+        .select("id, nombre, clinica, ejecutivo_id")
+        .single();
+      if (error) throw error;
+      setClientes((prev) => [...prev, data as Cliente]);
+      setFormCabecera((prev) => ({ ...prev, cliente_id: data.id }));
+      toast.success("Cliente creado y seleccionado");
+      setNuevoClienteOpen(false);
+      setNuevoCliente({ nombre: "", clinica: "", telefono: "", email: "" });
+    } catch (err: any) {
+      toast.error("Error al crear cliente: " + err.message);
+    } finally {
+      setCreandoCliente(false);
+    }
+  }
 
   async function cargarDatos() {
     setLoading(true);
@@ -612,23 +664,103 @@ function VentasPage() {
               <CardContent className="space-y-4 pt-6">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="cliente">Cliente de Cartera</Label>
-                    <Select
-                      value={formCabecera.cliente_id}
-                      onValueChange={(v) => setFormCabecera({ ...formCabecera, cliente_id: v })}
-                    >
-                      <SelectTrigger id="cliente"><SelectValue placeholder="Selecciona un cliente" /></SelectTrigger>
-                      <SelectContent>
-                        {clientes
-                          .filter(c => isAdmin || c.ejecutivo_id === user?.id)
-                          .map((c) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.nombre} {c.clinica ? `(${c.clinica})` : ""}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="cliente">Cliente de Cartera</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-primary hover:text-primary"
+                        onClick={() => setNuevoClienteOpen(true)}
+                      >
+                        <UserPlus className="mr-1 h-3.5 w-3.5" /> Nuevo cliente
+                      </Button>
+                    </div>
+                    {(() => {
+                      const visibles = clientes.filter(c => isAdmin || c.ejecutivo_id === user?.id);
+                      const seleccionado = visibles.find(c => c.id === formCabecera.cliente_id);
+                      return (
+                        <Popover open={clienteOpen} onOpenChange={setClienteOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id="cliente"
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={clienteOpen}
+                              className={cn(
+                                "w-full justify-between font-normal",
+                                !seleccionado && "text-muted-foreground"
+                              )}
+                            >
+                              <span className="truncate">
+                                {seleccionado
+                                  ? `${seleccionado.nombre}${seleccionado.clinica ? ` (${seleccionado.clinica})` : ""}`
+                                  : "Buscar cliente..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                            <Command
+                              filter={(value, search) =>
+                                value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+                              }
+                            >
+                              <CommandInput placeholder="Escribe nombre o clínica..." />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <div className="flex flex-col items-center gap-2 py-4 text-sm">
+                                    <span className="text-muted-foreground">Sin resultados.</span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setClienteOpen(false);
+                                        setNuevoClienteOpen(true);
+                                      }}
+                                    >
+                                      <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Crear nuevo cliente
+                                    </Button>
+                                  </div>
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {visibles.map((c) => {
+                                    const label = `${c.nombre}${c.clinica ? ` ${c.clinica}` : ""}`;
+                                    return (
+                                      <CommandItem
+                                        key={c.id}
+                                        value={label}
+                                        onSelect={() => {
+                                          setFormCabecera({ ...formCabecera, cliente_id: c.id });
+                                          setClienteOpen(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            formCabecera.cliente_id === c.id ? "opacity-100" : "opacity-0"
+                                          )}
+                                        />
+                                        <span className="truncate">
+                                          {c.nombre}
+                                          {c.clinica ? (
+                                            <span className="text-muted-foreground"> · {c.clinica}</span>
+                                          ) : null}
+                                        </span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      );
+                    })()}
                   </div>
+
 
                   {isAdmin && (
                     <div className="space-y-2">
@@ -962,6 +1094,65 @@ function VentasPage() {
           </Card>
         </div>
       )}
+
+      {/* Quick-create client dialog */}
+      <Dialog open={nuevoClienteOpen} onOpenChange={setNuevoClienteOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Nuevo cliente rápido</DialogTitle>
+            <DialogDescription>
+              Crea un cliente básico para asociarlo a esta venta. Podrás completar el resto de sus datos luego desde Clientes.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={crearClienteRapido} className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="nc-nombre">Nombre *</Label>
+              <Input
+                id="nc-nombre"
+                required
+                autoFocus
+                value={nuevoCliente.nombre}
+                onChange={(e) => setNuevoCliente({ ...nuevoCliente, nombre: e.target.value })}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="nc-clinica">Clínica</Label>
+              <Input
+                id="nc-clinica"
+                value={nuevoCliente.clinica}
+                onChange={(e) => setNuevoCliente({ ...nuevoCliente, clinica: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label htmlFor="nc-tel">Teléfono</Label>
+                <Input
+                  id="nc-tel"
+                  value={nuevoCliente.telefono}
+                  onChange={(e) => setNuevoCliente({ ...nuevoCliente, telefono: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="nc-email">Email</Label>
+                <Input
+                  id="nc-email"
+                  type="email"
+                  value={nuevoCliente.email}
+                  onChange={(e) => setNuevoCliente({ ...nuevoCliente, email: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter className="pt-2">
+              <Button type="button" variant="outline" onClick={() => setNuevoClienteOpen(false)}>
+                Cancelar
+              </Button>
+              <Button type="submit" disabled={creandoCliente}>
+                {creandoCliente ? "Creando..." : "Crear y seleccionar"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
