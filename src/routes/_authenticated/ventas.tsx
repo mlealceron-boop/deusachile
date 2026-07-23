@@ -664,23 +664,103 @@ function VentasPage() {
               <CardContent className="space-y-4 pt-6">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="cliente">Cliente de Cartera</Label>
-                    <Select
-                      value={formCabecera.cliente_id}
-                      onValueChange={(v) => setFormCabecera({ ...formCabecera, cliente_id: v })}
-                    >
-                      <SelectTrigger id="cliente"><SelectValue placeholder="Selecciona un cliente" /></SelectTrigger>
-                      <SelectContent>
-                        {clientes
-                          .filter(c => isAdmin || c.ejecutivo_id === user?.id)
-                          .map((c) => (
-                            <SelectItem key={c.id} value={c.id}>
-                              {c.nombre} {c.clinica ? `(${c.clinica})` : ""}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="cliente">Cliente de Cartera</Label>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 text-xs text-primary hover:text-primary"
+                        onClick={() => setNuevoClienteOpen(true)}
+                      >
+                        <UserPlus className="mr-1 h-3.5 w-3.5" /> Nuevo cliente
+                      </Button>
+                    </div>
+                    {(() => {
+                      const visibles = clientes.filter(c => isAdmin || c.ejecutivo_id === user?.id);
+                      const seleccionado = visibles.find(c => c.id === formCabecera.cliente_id);
+                      return (
+                        <Popover open={clienteOpen} onOpenChange={setClienteOpen}>
+                          <PopoverTrigger asChild>
+                            <Button
+                              id="cliente"
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={clienteOpen}
+                              className={cn(
+                                "w-full justify-between font-normal",
+                                !seleccionado && "text-muted-foreground"
+                              )}
+                            >
+                              <span className="truncate">
+                                {seleccionado
+                                  ? `${seleccionado.nombre}${seleccionado.clinica ? ` (${seleccionado.clinica})` : ""}`
+                                  : "Buscar cliente..."}
+                              </span>
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                            <Command
+                              filter={(value, search) =>
+                                value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+                              }
+                            >
+                              <CommandInput placeholder="Escribe nombre o clínica..." />
+                              <CommandList>
+                                <CommandEmpty>
+                                  <div className="flex flex-col items-center gap-2 py-4 text-sm">
+                                    <span className="text-muted-foreground">Sin resultados.</span>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        setClienteOpen(false);
+                                        setNuevoClienteOpen(true);
+                                      }}
+                                    >
+                                      <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Crear nuevo cliente
+                                    </Button>
+                                  </div>
+                                </CommandEmpty>
+                                <CommandGroup>
+                                  {visibles.map((c) => {
+                                    const label = `${c.nombre}${c.clinica ? ` ${c.clinica}` : ""}`;
+                                    return (
+                                      <CommandItem
+                                        key={c.id}
+                                        value={label}
+                                        onSelect={() => {
+                                          setFormCabecera({ ...formCabecera, cliente_id: c.id });
+                                          setClienteOpen(false);
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            "mr-2 h-4 w-4",
+                                            formCabecera.cliente_id === c.id ? "opacity-100" : "opacity-0"
+                                          )}
+                                        />
+                                        <span className="truncate">
+                                          {c.nombre}
+                                          {c.clinica ? (
+                                            <span className="text-muted-foreground"> · {c.clinica}</span>
+                                          ) : null}
+                                        </span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      );
+                    })()}
                   </div>
+
 
                   {isAdmin && (
                     <div className="space-y-2">
